@@ -1,0 +1,68 @@
+import { createContext, useContext, useEffect, useState } from 'react'
+import { supabase } from '../lib/supabase'
+
+const AuthContext = createContext(null)
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null)
+  const [profile, setProfile] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+      if (session?.user) loadProfile(session.user.id)
+      else setLoading(false)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+      if (session?.user) loadProfile(session.user.id)
+      else {
+        setProfile(null)
+        setLoading(false)
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  async function loadProfile(userId) {
+    const { data } = await supabase.from('perfiles').select('*').eq('id', userId).single()
+    setProfile(data)
+    setLoading(false)
+  }
+
+  async function signIn(email, password) {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    return { error }
+  }
+
+  // Datos del perfil van como metadata → el trigger on_auth_user_created los usa
+  // para insertar en `perfiles` con security definer (evita problemas de RLS con confirmación de email)
+  async function signUp({ nombre, email, password, telefono, rol }) {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { nombre, telefono: telefono || null, rol },
+      },
+    })
+    if (error) return { error, needsConfirmation: false }
+
+    const needsConfirmation = !!data.user && !data.session
+    return { error: null, needsConfirmation }
+  }
+
+  async function signOut() {
+    await supabase.auth.signOut()
+  }
+
+  return (
+    <AuthContext.Provider value={{ user, profile, setProfile, loading, signIn, signUp, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export const useAuth = () => useContext(AuthContext)
