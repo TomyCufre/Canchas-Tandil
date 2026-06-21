@@ -23,6 +23,7 @@ export default function RegisterPage() {
   async function handleSubmit(e) {
     e.preventDefault()
     if (form.password.length < 6) { setError('La contraseña debe tener al menos 6 caracteres'); return }
+    if (!form.telefono.trim()) { setError('El teléfono es obligatorio'); return }
     setError('')
     setLoading(true)
     const { error, needsConfirmation: confirm } = await signUp(form)
@@ -85,8 +86,8 @@ export default function RegisterPage() {
               <input type="password" className="form-input" placeholder="Mínimo 6 caracteres" value={form.password} onChange={set('password')} required />
             </div>
             <div className="form-group">
-              <label className="form-label">Teléfono <span style={{ color: 'var(--muted)', fontWeight: 400 }}>(opcional)</span></label>
-              <input type="tel" className="form-input" placeholder="2494 000000" value={form.telefono} onChange={set('telefono')} />
+              <label className="form-label">Teléfono</label>
+              <input type="tel" className="form-input" placeholder="2494 000000" value={form.telefono} onChange={set('telefono')} required />
             </div>
 
             <div className="form-group">
