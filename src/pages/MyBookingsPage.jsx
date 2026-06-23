@@ -94,7 +94,8 @@ export default function MyBookingsPage() {
     const horaI = timeToHour(r.hora_inicio), horaF = timeToHour(r.hora_fin)
     const [y, m, d] = r.fecha.split('-')
     const link = `${window.location.origin}/reserva/${r.codigo}`
-    const msg = `⚽ Reservé cancha en *${r.canchas?.nombre}*\n📅 ${d}/${m}/${y}\n🕐 ${horaI}:00 – ${horaF}:00 hs\n📍 ${r.canchas?.direccion}\n🎫 Código: ${r.codigo}\n\n${link}`
+    const monto = Number(r.monto || r.canchas?.precio_hora || 0).toLocaleString('es-AR')
+    const msg = `⚽ Reservé cancha en *${r.canchas?.nombre}*\n📅 ${d}/${m}/${y}\n🕐 ${horaI}:00 – ${horaF}:00 hs\n💵 $${monto}\n📍 ${r.canchas?.direccion}\n🎫 Código: ${r.codigo}\n\n${link}`
     return `https://wa.me/?text=${encodeURIComponent(msg)}`
   }
 

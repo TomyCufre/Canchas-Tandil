@@ -93,6 +93,12 @@ export default function ShareReservaPage() {
                 </div>
                 <div style={{ fontWeight: 700, fontSize: 15 }}>{horaI}:00 – {horaF}:00 hs</div>
               </div>
+              {reserva.monto != null && (
+                <div>
+                  <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Precio</div>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--green)' }}>${Number(reserva.monto).toLocaleString('es-AR')}</div>
+                </div>
+              )}
             </div>
 
             <div style={{ borderTop: '2px dashed var(--border-dark)', paddingTop: 20 }}>

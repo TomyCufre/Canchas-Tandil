@@ -107,7 +107,8 @@ export default function CourtDetailPage() {
     const horaI = timeToHour(reserva.hora_inicio)
     const horaF = timeToHour(reserva.hora_fin)
     const [y, m, d] = reserva.fecha.split('-')
-    const msg = `⚽ Reservé cancha en *${cancha.nombre}*\n📅 ${d}/${m}/${y}\n🕐 ${horaI}:00 – ${horaF}:00 hs\n📍 ${cancha.direccion}\n🎫 Código: ${reserva.codigo}`
+    const monto = Number(reserva.monto || cancha.precio_hora).toLocaleString('es-AR')
+    const msg = `⚽ Reservé cancha en *${cancha.nombre}*\n📅 ${d}/${m}/${y}\n🕐 ${horaI}:00 – ${horaF}:00 hs\n💵 $${monto}\n📍 ${cancha.direccion}\n🎫 Código: ${reserva.codigo}`
     return `https://wa.me/?text=${encodeURIComponent(msg)}`
   }
 
@@ -362,11 +363,12 @@ export default function CourtDetailPage() {
                 {[
                   ['Cancha', cancha.nombre],
                   ['Dirección', cancha.direccion],
+                  ['Precio', `$${Number(reservaCreada.monto || cancha.precio_hora).toLocaleString('es-AR')}`],
                   ['Pago', reservaCreada.metodo_pago === 'presencial' ? 'En el lugar' : 'Mercado Pago'],
                 ].map(([label, value]) => (
                   <div key={label} style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ color: 'var(--muted)' }}>{label}</span>
-                    <span style={{ fontWeight: 600 }}>{value}</span>
+                    <span style={{ fontWeight: label === 'Precio' ? 700 : 600, color: label === 'Precio' ? 'var(--green)' : undefined }}>{value}</span>
                   </div>
                 ))}
               </div>
