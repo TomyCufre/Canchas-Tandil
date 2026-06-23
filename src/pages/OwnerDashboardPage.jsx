@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { TIPO_LABEL, timeToHour } from '../lib/tipoCancha'
-import { Plus, Edit2, Trash2, Eye, EyeOff, Clock, CalendarCheck, CheckCircle, XCircle, MessageCircle } from 'lucide-react'
+import { Plus, Edit2, Trash2, Eye, EyeOff, Clock, CalendarCheck, CheckCircle, XCircle, MessageCircle, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react'
 import { useSEO } from '../hooks/useSEO'
 
 const ESTADO_BADGE = {
@@ -120,6 +120,9 @@ export default function OwnerDashboardPage() {
 
         <div className="tabs">
           <button className={`tab-btn ${tab === 'canchas' ? 'active' : ''}`} onClick={() => setTab('canchas')}>Mis canchas ({canchas.length})</button>
+          <button className={`tab-btn ${tab === 'calendario' ? 'active' : ''}`} onClick={() => setTab('calendario')}>
+            <CalendarDays size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />Calendario
+          </button>
           <button className={`tab-btn ${tab === 'proximas' ? 'active' : ''}`} onClick={() => setTab('proximas')}>
             Próximas ({proximas.length})
             {pendientes.length > 0 && <span className="badge badge-yellow" style={{ marginLeft: 6 }}>{pendientes.length}</span>}
@@ -186,6 +189,10 @@ export default function OwnerDashboardPage() {
               ))}
             </div>
           )
+        )}
+
+        {tab === 'calendario' && (
+          <CalendarView reservas={reservas} canchas={canchas} onRefresh={fetchData} />
         )}
 
         {(tab === 'proximas' || tab === 'historial') && (
@@ -312,5 +319,155 @@ function ReservasList({ reservas, onRefresh }) {
         )
       })()}
     </>
+  )
+}
+
+const MESES_CAL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+const DIAS_CAL  = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']
+const ESTADO_COLOR = { pendiente: '#d97706', confirmada: '#16a34a', completada: '#6b7280' }
+
+function CalendarView({ reservas, canchas, onRefresh }) {
+  const ahora = new Date()
+  const [cursor, setCursor] = useState({ year: ahora.getFullYear(), month: ahora.getMonth() })
+  const [canchaFiltro, setCanchaFiltro] = useState('todas')
+  const [diaSel, setDiaSel] = useState(null) // 'YYYY-MM-DD'
+
+  const hoyStr = `${ahora.getFullYear()}-${String(ahora.getMonth()+1).padStart(2,'0')}-${String(ahora.getDate()).padStart(2,'0')}`
+
+  // Agrupar reservas (sin canceladas) por fecha, aplicando filtro de cancha
+  const porFecha = {}
+  reservas.forEach(r => {
+    if (r.estado === 'cancelada') return
+    if (canchaFiltro !== 'todas' && r.cancha_id !== canchaFiltro) return
+    ;(porFecha[r.fecha] ||= []).push(r)
+  })
+
+  // Construir celdas del mes (lunes primero)
+  const offset = (new Date(cursor.year, cursor.month, 1).getDay() + 6) % 7
+  const diasEnMes = new Date(cursor.year, cursor.month + 1, 0).getDate()
+  const celdas = [...Array(offset).fill(null), ...Array.from({ length: diasEnMes }, (_, i) => i + 1)]
+
+  const fechaStr = d => `${cursor.year}-${String(cursor.month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`
+  const cambiarMes = delta => setCursor(c => {
+    const nd = new Date(c.year, c.month + delta, 1)
+    return { year: nd.getFullYear(), month: nd.getMonth() }
+  })
+
+  const totalMes = celdas.reduce((s, d) => d ? s + (porFecha[fechaStr(d)]?.length || 0) : s, 0)
+  const reservasDiaSel = diaSel
+    ? (porFecha[diaSel] || []).slice().sort((a, b) => a.hora_inicio.localeCompare(b.hora_inicio))
+    : []
+
+  return (
+    <div className="card" style={{ padding: 16 }}>
+      {/* Header: navegación de mes + filtro de cancha */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button onClick={() => cambiarMes(-1)} className="btn btn-secondary btn-sm" aria-label="Mes anterior"><ChevronLeft size={16} /></button>
+          <div style={{ fontWeight: 700, fontSize: 15, minWidth: 130, textAlign: 'center' }}>
+            {MESES_CAL[cursor.month]} {cursor.year}
+          </div>
+          <button onClick={() => cambiarMes(1)} className="btn btn-secondary btn-sm" aria-label="Mes siguiente"><ChevronRight size={16} /></button>
+          <button onClick={() => setCursor({ year: ahora.getFullYear(), month: ahora.getMonth() })} className="btn btn-ghost btn-sm">Hoy</button>
+        </div>
+        {canchas.length > 1 && (
+          <select value={canchaFiltro} onChange={e => setCanchaFiltro(e.target.value)} className="form-input" style={{ width: 'auto', minWidth: 160, padding: '6px 10px', fontSize: 13 }}>
+            <option value="todas">Todas las canchas</option>
+            {canchas.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+          </select>
+        )}
+      </div>
+
+      <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 12 }}>
+        {totalMes} turno{totalMes !== 1 ? 's' : ''} reservado{totalMes !== 1 ? 's' : ''} este mes
+      </div>
+
+      {/* Encabezado de días */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, marginBottom: 4 }}>
+        {DIAS_CAL.map(d => (
+          <div key={d} style={{ textAlign: 'center', fontSize: 11, fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', padding: '4px 0' }}>{d}</div>
+        ))}
+      </div>
+
+      {/* Grilla del mes */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
+        {celdas.map((d, i) => {
+          if (!d) return <div key={`e${i}`} />
+          const fs = fechaStr(d)
+          const lista = porFecha[fs] || []
+          const esHoy = fs === hoyStr
+          const tienePendientes = lista.some(r => r.estado === 'pendiente')
+          const clickable = lista.length > 0
+          return (
+            <button
+              key={fs}
+              onClick={() => clickable && setDiaSel(fs)}
+              disabled={!clickable}
+              style={{
+                minHeight: 62, padding: '6px 4px', borderRadius: 'var(--radius)', textAlign: 'left',
+                border: `1px solid ${esHoy ? 'var(--green)' : 'var(--border)'}`,
+                background: lista.length ? (tienePendientes ? '#fffbeb' : 'var(--green-50)') : 'var(--card)',
+                cursor: clickable ? 'pointer' : 'default',
+                display: 'flex', flexDirection: 'column', gap: 4,
+              }}
+            >
+              <div style={{
+                fontSize: 12, fontWeight: esHoy ? 800 : 500, alignSelf: 'flex-start',
+                color: esHoy ? 'white' : 'var(--text)',
+                background: esHoy ? 'var(--green)' : 'transparent',
+                borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>{d}</div>
+              {lista.length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
+                  {lista.slice(0, 4).map(r => (
+                    <span key={r.id} style={{ width: 6, height: 6, borderRadius: '50%', background: ESTADO_COLOR[r.estado] || '#6b7280' }} />
+                  ))}
+                  {lista.length > 4 && <span style={{ fontSize: 9, color: 'var(--muted)', fontWeight: 600 }}>+{lista.length - 4}</span>}
+                </div>
+              )}
+              {lista.length > 0 && (
+                <div style={{ fontSize: 10, color: 'var(--muted)', fontWeight: 600, marginTop: 'auto' }}>
+                  {lista.length} turno{lista.length !== 1 ? 's' : ''}
+                </div>
+              )}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Leyenda */}
+      <div style={{ display: 'flex', gap: 16, marginTop: 14, fontSize: 12, color: 'var(--muted)', flexWrap: 'wrap' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: ESTADO_COLOR.confirmada }} /> Confirmada
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: ESTADO_COLOR.pendiente }} /> Pendiente
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: ESTADO_COLOR.completada }} /> Completada
+        </span>
+      </div>
+
+      {/* Detalle del día seleccionado */}
+      {diaSel && (() => {
+        const [y, m, d] = diaSel.split('-').map(Number)
+        const fecha = new Date(y, m - 1, d)
+        return (
+          <div className="modal-overlay" onClick={() => setDiaSel(null)}>
+            <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 560 }}>
+              <div className="modal-header">
+                <h3>{DIAS_CAL[(fecha.getDay() + 6) % 7]} {d} de {MESES_CAL[m-1].toLowerCase()}</h3>
+                <button onClick={() => setDiaSel(null)} className="btn btn-ghost btn-sm">✕</button>
+              </div>
+              <div className="modal-body" style={{ padding: reservasDiaSel.length ? 0 : 24 }}>
+                {reservasDiaSel.length === 0
+                  ? <div style={{ textAlign: 'center', color: 'var(--muted)' }}>Sin turnos este día</div>
+                  : <ReservasList reservas={reservasDiaSel} onRefresh={() => { onRefresh(); setDiaSel(null) }} />}
+              </div>
+            </div>
+          </div>
+        )
+      })()}
+    </div>
   )
 }
