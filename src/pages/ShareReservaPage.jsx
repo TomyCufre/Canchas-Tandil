@@ -20,11 +20,9 @@ export default function ShareReservaPage() {
     description: reserva ? `Turno en ${reserva.canchas?.nombre}, ${reserva.canchas?.direccion}. Código: ${codigo}.` : undefined,
   })
   useEffect(() => {
+    // RPC segura: devuelve solo la reserva de este código, sin exponer el resto de la tabla
     supabase
-      .from('reservas')
-      .select('*, canchas(nombre, direccion, tipo, maps_url, latitud, longitud)')
-      .eq('codigo', codigo)
-      .single()
+      .rpc('get_reserva_por_codigo', { p_codigo: codigo })
       .then(({ data }) => { setReserva(data); setLoading(false) })
   }, [codigo])
 

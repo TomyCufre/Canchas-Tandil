@@ -25,12 +25,8 @@ export default function TimeSlotGrid({ canchaId, fecha, diaHorarios, onSelect, s
   }, [canchaId, fecha])
 
   async function fetchReservas() {
-    const { data } = await supabase
-      .from('reservas')
-      .select('hora_inicio, estado')
-      .eq('cancha_id', canchaId)
-      .eq('fecha', fecha)
-      .neq('estado', 'cancelada')
+    // RPC segura: devuelve solo las horas ocupadas, sin exponer datos personales
+    const { data } = await supabase.rpc('horas_ocupadas', { p_cancha_id: canchaId, p_fecha: fecha })
     setReservas(data || [])
     setLoading(false)
   }
@@ -49,16 +45,22 @@ export default function TimeSlotGrid({ canchaId, fecha, diaHorarios, onSelect, s
       .map(h => timeToHour(h.hora_inicio))
   )
 
+  // Si la fecha es hoy, las horas que ya pasaron no se pueden reservar
+  const ahora = new Date()
+  const hoyStr = `${ahora.getFullYear()}-${String(ahora.getMonth()+1).padStart(2,'0')}-${String(ahora.getDate()).padStart(2,'0')}`
+  const esHoy = fecha === hoyStr
+
   return (
     <div className="slot-grid">
       {HORAS.map(hora => {
         const ocupado = reservadasHoras.has(hora)
         const disponible = horariosActivosHoras.has(hora)
         const seleccionado = selectedHora === hora
+        const pasado = esHoy && hora <= ahora.getHours()
 
-        if (!disponible) {
+        if (!disponible || pasado) {
           return (
-            <div key={hora} style={slotStyle('disabled')} title="No disponible">
+            <div key={hora} style={slotStyle('disabled')} title={pasado ? 'Horario pasado' : 'No disponible'}>
               <span>{hora}:00</span>
             </div>
           )
