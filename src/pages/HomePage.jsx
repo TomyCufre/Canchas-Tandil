@@ -9,6 +9,7 @@ const TIPOS_FILTRO = ['Todos', ...Object.keys(TIPO_DB)]
 
 export default function HomePage() {
   const [canchas, setCanchas] = useState([])
+  const [ratings, setRatings] = useState({})
   const [loading, setLoading] = useState(true)
   const [busqueda, setBusqueda] = useState('')
   const [tipoFiltro, setTipoFiltro] = useState('Todos')
@@ -20,9 +21,24 @@ export default function HomePage() {
   useEffect(() => { fetchCanchas() }, [])
 
   async function fetchCanchas() {
-    const { data } = await supabase
-      .from('canchas').select('*').eq('activa', true)
-    setCanchas(data || [])
+    const [{ data: cs }, { data: rs }] = await Promise.all([
+      supabase.from('canchas').select('*').eq('activa', true),
+      supabase.from('resenas').select('cancha_id, puntuacion'),
+    ])
+    setCanchas(cs || [])
+
+    // Promedio y cantidad de reseñas por cancha
+    const acum = {}
+    ;(rs || []).forEach(r => {
+      const a = acum[r.cancha_id] || { suma: 0, cantidad: 0 }
+      a.suma += r.puntuacion; a.cantidad += 1
+      acum[r.cancha_id] = a
+    })
+    const map = {}
+    Object.entries(acum).forEach(([id, { suma, cantidad }]) => {
+      map[id] = { promedio: suma / cantidad, cantidad }
+    })
+    setRatings(map)
     setLoading(false)
   }
 
@@ -164,7 +180,7 @@ export default function HomePage() {
               {precioMax && Number(precioMax) < precioMaxDB && ` · hasta $${Number(precioMax).toLocaleString('es-AR')}/h`}
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-              {filtradas.map(c => <CourtCard key={c.id} cancha={c} />)}
+              {filtradas.map(c => <CourtCard key={c.id} cancha={c} rating={ratings[c.id]} />)}
             </div>
           </>
         )}

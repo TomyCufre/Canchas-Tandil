@@ -4,13 +4,15 @@ import { TIPO_LABEL } from '../lib/tipoCancha'
 
 const TIPO_BADGE = {
   futbol5: 'badge-green',
+  futbol6: 'badge-green',
   futbol7: 'badge-blue',
+  futbol8: 'badge-blue',
   futbol11: 'badge-yellow',
   techo: 'badge-gray',
   indoor: 'badge-gray',
 }
 
-export default function CourtCard({ cancha }) {
+export default function CourtCard({ cancha, rating }) {
   const fotos = cancha.fotos?.length ? cancha.fotos : (cancha.foto_url ? [cancha.foto_url] : [])
   const foto = fotos[0]
   const label = TIPO_LABEL[cancha.tipo] || cancha.tipo
@@ -39,6 +41,19 @@ export default function CourtCard({ cancha }) {
             <MapPin size={12} />
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cancha.direccion}</span>
           </div>
+          {rating
+            ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, marginBottom: 8 }}>
+                <Star size={13} style={{ color: '#f59e0b', fill: '#f59e0b' }} />
+                <span style={{ fontWeight: 700 }}>{rating.promedio.toFixed(1)}</span>
+                <span style={{ color: 'var(--muted)' }}>({rating.cantidad})</span>
+              </div>
+            )
+            : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, marginBottom: 8, color: 'var(--muted)' }}>
+                <Star size={13} /> Sin reseñas
+              </div>
+            )}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--muted)', fontSize: 12 }}>
               {cancha.tiene_iluminacion && <span title="Iluminación">💡</span>}

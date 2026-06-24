@@ -53,27 +53,25 @@ export default function ManageSchedulePage() {
   }
 
   async function toggleDia(dia) {
-    const alguno = HORAS.some(h => isActivo(dia, h))
-    for (const hora of HORAS) {
-      const existente = getSlot(dia, hora)
-      if (existente) await supabase.from('horarios').update({ activo: !alguno }).eq('id', existente.id)
-      else if (!alguno) await supabase.from('horarios').insert({
-        cancha_id: id, dia_semana: dia,
-        hora_inicio: hourToTime(hora), hora_fin: hourToTime(hora + 1), activo: true,
-      })
+    const target = !HORAS.some(h => isActivo(dia, h))
+    const existentes = horarios.filter(h => h.dia_semana === dia)
+    if (existentes.length) await supabase.from('horarios').update({ activo: target }).in('id', existentes.map(h => h.id))
+    if (target) {
+      const faltantes = HORAS.filter(h => !existentes.some(e => e.hora_inicio === hourToTime(h)))
+        .map(h => ({ cancha_id: id, dia_semana: dia, hora_inicio: hourToTime(h), hora_fin: hourToTime(h + 1), activo: true }))
+      if (faltantes.length) await supabase.from('horarios').insert(faltantes)
     }
     fetchData()
   }
 
   async function toggleHora(hora) {
-    const alguno = DIAS.some((_, dia) => isActivo(dia, hora))
-    for (let dia = 0; dia <= 6; dia++) {
-      const existente = getSlot(dia, hora)
-      if (existente) await supabase.from('horarios').update({ activo: !alguno }).eq('id', existente.id)
-      else if (!alguno) await supabase.from('horarios').insert({
-        cancha_id: id, dia_semana: dia,
-        hora_inicio: hourToTime(hora), hora_fin: hourToTime(hora + 1), activo: true,
-      })
+    const target = !DIAS.some((_, dia) => isActivo(dia, hora))
+    const existentes = horarios.filter(h => h.hora_inicio === hourToTime(hora))
+    if (existentes.length) await supabase.from('horarios').update({ activo: target }).in('id', existentes.map(h => h.id))
+    if (target) {
+      const faltantes = DIAS.map((_, dia) => dia).filter(dia => !existentes.some(e => e.dia_semana === dia))
+        .map(dia => ({ cancha_id: id, dia_semana: dia, hora_inicio: hourToTime(hora), hora_fin: hourToTime(hora + 1), activo: true }))
+      if (faltantes.length) await supabase.from('horarios').insert(faltantes)
     }
     fetchData()
   }
