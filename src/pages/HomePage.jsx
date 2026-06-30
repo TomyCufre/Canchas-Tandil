@@ -9,6 +9,14 @@ import { useSEO } from '../hooks/useSEO'
 
 const TIPOS_FILTRO = ['Todos', ...Object.keys(TIPO_DB)]
 
+// Distancia en km entre dos coordenadas (haversine)
+function distanciaKm(a, b) {
+  const R = 6371, toRad = d => (d * Math.PI) / 180
+  const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng)
+  const x = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2
+  return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x))
+}
+
 export default function HomePage() {
   const { user } = useAuth()
   const [canchas, setCanchas] = useState([])
@@ -22,6 +30,23 @@ export default function HomePage() {
   const [ordenar, setOrdenar] = useState('recientes')
   const [mostrarFiltros, setMostrarFiltros] = useState(false)
   const [vista, setVista] = useState('lista')
+  const [userPos, setUserPos] = useState(null)
+  const [geoEstado, setGeoEstado] = useState('') // '', 'pidiendo', 'error'
+
+  function pedirUbicacion() {
+    if (userPos || !navigator.geolocation) { if (!navigator.geolocation) setGeoEstado('error'); return }
+    setGeoEstado('pidiendo')
+    navigator.geolocation.getCurrentPosition(
+      pos => { setUserPos({ lat: pos.coords.latitude, lng: pos.coords.longitude }); setGeoEstado('') },
+      () => setGeoEstado('error'),
+      { timeout: 10000 }
+    )
+  }
+
+  function handleOrdenar(value) {
+    setOrdenar(value)
+    if (value === 'cercania') pedirUbicacion()
+  }
 
   useSEO({ title: 'Canchas de fútbol en Tandil', description: 'Encontrá y reservá canchas de fútbol en Tandil. Fútbol 5, 6, 7, 8 y 11. Turnos online en segundos.' })
   useEffect(() => { fetchCanchas() }, [])
@@ -80,6 +105,10 @@ export default function HomePage() {
   if (ordenar === 'precio_asc') filtradas = [...filtradas].sort((a, b) => a.precio_hora - b.precio_hora)
   else if (ordenar === 'precio_desc') filtradas = [...filtradas].sort((a, b) => b.precio_hora - a.precio_hora)
   else if (ordenar === 'nombre') filtradas = [...filtradas].sort((a, b) => a.nombre.localeCompare(b.nombre))
+  else if (ordenar === 'cercania' && userPos) {
+    const dist = c => (c.latitud && c.longitud) ? distanciaKm(userPos, { lat: c.latitud, lng: c.longitud }) : Infinity
+    filtradas = [...filtradas].sort((a, b) => dist(a) - dist(b))
+  }
   else filtradas = [...filtradas].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 
   const hayFiltrosActivos = tipoFiltro !== 'Todos' || precioMax || busqueda || soloFavoritos
@@ -147,9 +176,10 @@ export default function HomePage() {
             </button>
           )}
 
-          <select value={ordenar} onChange={e => setOrdenar(e.target.value)}
+          <select value={ordenar} onChange={e => handleOrdenar(e.target.value)}
             className="form-select" style={{ marginLeft: 'auto', width: 'auto', fontSize: 13, padding: '6px 10px' }}>
             <option value="recientes">Más recientes</option>
+            <option value="cercania">Más cercanas</option>
             <option value="precio_asc">Precio: menor a mayor</option>
             <option value="precio_desc">Precio: mayor a menor</option>
             <option value="nombre">Nombre A-Z</option>
@@ -223,6 +253,15 @@ export default function HomePage() {
               </div>
             </div>
 
+            {ordenar === 'cercania' && geoEstado === 'pidiendo' && (
+              <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 12 }}>Obteniendo tu ubicación…</p>
+            )}
+            {ordenar === 'cercania' && geoEstado === 'error' && (
+              <p style={{ fontSize: 12, color: 'var(--error)', marginBottom: 12 }}>
+                No pudimos acceder a tu ubicación. Activá los permisos del navegador para ordenar por cercanía.
+              </p>
+            )}
+
             {vista === 'mapa' ? (
               <CanchasMap canchas={filtradas} />
             ) : (
@@ -234,6 +273,8 @@ export default function HomePage() {
                     rating={ratings[c.id]}
                     esFavorito={favoritos.has(c.id)}
                     onToggleFavorito={user ? toggleFavorito : undefined}
+                    distancia={ordenar === 'cercania' && userPos && c.latitud && c.longitud
+                      ? distanciaKm(userPos, { lat: c.latitud, lng: c.longitud }) : null}
                   />
                 ))}
               </div>

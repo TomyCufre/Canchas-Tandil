@@ -12,7 +12,7 @@ const TIPO_BADGE = {
   indoor: 'badge-gray',
 }
 
-export default function CourtCard({ cancha, rating, esFavorito, onToggleFavorito }) {
+export default function CourtCard({ cancha, rating, esFavorito, onToggleFavorito, distancia }) {
   const fotos = cancha.fotos?.length ? cancha.fotos : (cancha.foto_url ? [cancha.foto_url] : [])
   const foto = fotos[0]
   const label = TIPO_LABEL[cancha.tipo] || cancha.tipo
@@ -53,7 +53,10 @@ export default function CourtCard({ cancha, rating, esFavorito, onToggleFavorito
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--muted)', fontSize: 12, marginBottom: 8 }}>
             <MapPin size={12} />
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cancha.direccion}</span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {cancha.direccion}
+              {distancia != null && ` · a ${distancia < 1 ? Math.round(distancia * 1000) + ' m' : distancia.toFixed(1) + ' km'}`}
+            </span>
           </div>
           {rating
             ? (
