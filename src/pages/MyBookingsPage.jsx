@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { timeToHour } from '../lib/tipoCancha'
-import { Calendar, X, Share2, Star, MessageCircle } from 'lucide-react'
+import { Calendar, X, Share2, Star, MessageCircle, CalendarPlus } from 'lucide-react'
 import StarRating from '../components/StarRating'
 import { useSEO } from '../hooks/useSEO'
 
@@ -88,6 +88,23 @@ export default function MyBookingsPage() {
     const existente = resenas[r.id]
     setResenaForm({ puntuacion: existente?.puntuacion || 0, comentario: existente?.comentario || '' })
     setModalResena(r)
+  }
+
+  function googleCalLink(r) {
+    const [y, m, d] = r.fecha.split('-').map(Number)
+    const hi = timeToHour(r.hora_inicio), hf = timeToHour(r.hora_fin)
+    // Tandil es UTC-3: sumamos 3h para obtener el horario en UTC
+    const fmt = dt => dt.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
+    const start = new Date(Date.UTC(y, m - 1, d, hi + 3, 0, 0))
+    const end   = new Date(Date.UTC(y, m - 1, d, hf + 3, 0, 0))
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: `⚽ Turno de fútbol — ${r.canchas?.nombre}`,
+      dates: `${fmt(start)}/${fmt(end)}`,
+      details: `Reserva en ${r.canchas?.nombre}. Código: ${r.codigo}.`,
+      location: r.canchas?.direccion || 'Tandil',
+    })
+    return `https://calendar.google.com/calendar/render?${params.toString()}`
   }
 
   function waCompartir(r) {
@@ -189,6 +206,13 @@ export default function MyBookingsPage() {
                         className="btn btn-ghost btn-sm" title="Compartir por WhatsApp" style={{ color: '#25d366' }}>
                         <MessageCircle size={14} />
                       </a>
+                      {/* Recordatorio: agregar al calendario (solo turnos futuros vigentes) */}
+                      {!yaPaso && r.estado !== 'cancelada' && (
+                        <a href={googleCalLink(r)} target="_blank" rel="noopener noreferrer"
+                          className="btn btn-ghost btn-sm" title="Agregar al calendario" style={{ color: 'var(--green)' }}>
+                          <CalendarPlus size={14} />
+                        </a>
+                      )}
 
                       {/* Cancelar */}
                       {r.estado === 'pendiente' && tab === 'proximas' && (
