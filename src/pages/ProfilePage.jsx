@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { Camera, Save, User } from 'lucide-react'
+import { normalizarTelefono } from '../lib/telefono'
 
 export default function ProfilePage() {
   const { user, profile, setProfile } = useAuth()
@@ -33,8 +34,10 @@ export default function ProfilePage() {
     if (upErr) { setError('Error al subir la foto'); setUploading(false); return }
 
     const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(data.path)
-    await supabase.from('perfiles').update({ avatar_url: publicUrl }).eq('id', user.id)
-    setProfile(p => ({ ...p, avatar_url: publicUrl }))
+    // Anti-caché: el path se reutiliza (upsert), así forzamos al navegador a recargar la imagen
+    const urlConCache = `${publicUrl}?t=${Date.now()}`
+    await supabase.from('perfiles').update({ avatar_url: urlConCache }).eq('id', user.id)
+    setProfile(p => ({ ...p, avatar_url: urlConCache }))
     setUploading(false)
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
@@ -42,13 +45,15 @@ export default function ProfilePage() {
   async function handleSubmit(e) {
     e.preventDefault()
     if (!form.nombre.trim()) { setError('El nombre es obligatorio'); return }
+    const tel = normalizarTelefono(form.telefono)
+    if (!tel) { setError('Ingresá un número de celular argentino válido (ej: 2494 123456)'); return }
     setSaving(true); setError(''); setOk(false)
     const { error: err } = await supabase.from('perfiles')
-      .update({ nombre: form.nombre.trim(), telefono: form.telefono.trim() || null })
+      .update({ nombre: form.nombre.trim(), telefono: tel })
       .eq('id', user.id)
     setSaving(false)
     if (err) { setError('Error al guardar'); return }
-    setProfile(p => ({ ...p, nombre: form.nombre.trim(), telefono: form.telefono.trim() || null }))
+    setProfile(p => ({ ...p, nombre: form.nombre.trim(), telefono: tel }))
     setOk(true)
     setTimeout(() => setOk(false), 3000)
   }
@@ -100,9 +105,9 @@ export default function ProfilePage() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Teléfono <span style={{ color: 'var(--muted)', fontSize: 12 }}>(opcional)</span></label>
-            <input className="form-input" placeholder="2494 000000" value={form.telefono} onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))} />
-            <p className="form-hint">Se usa para que los dueños de canchas puedan contactarte</p>
+            <label className="form-label">Celular</label>
+            <input type="tel" inputMode="tel" className="form-input" placeholder="2494 123456" value={form.telefono} onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))} required />
+            <p className="form-hint">Tu celular con código de área, sin el 0 ni el 15. Lo usan los dueños para coordinar la reserva.</p>
           </div>
 
           <div className="form-group">
