@@ -38,8 +38,10 @@ export default function CourtDetailPage() {
   const [horaSeleccionada, setHoraSeleccionada] = useState(null)
   const [modal, setModal] = useState(null)
   const [metodoPago, setMetodoPago] = useState('presencial')
+  const [repetirSemanas, setRepetirSemanas] = useState(1)
   const [reservando, setReservando] = useState(false)
   const [reservaCreada, setReservaCreada] = useState(null)
+  const [resumenRecurrente, setResumenRecurrente] = useState(null)
   const [errorReserva, setErrorReserva] = useState('')
 
   useSEO({
@@ -65,6 +67,7 @@ export default function CourtDetailPage() {
   function handleSelectHora(hora) {
     if (!user) { navigate('/login'); return }
     setHoraSeleccionada(hora)
+    setRepetirSemanas(1)
     setModal('booking')
     setErrorReserva('')
   }
@@ -72,35 +75,45 @@ export default function CourtDetailPage() {
   async function confirmarReserva() {
     setReservando(true)
     setErrorReserva('')
-    const fecha = formatFecha(fechas[fechaIdx])
     const hora_inicio = hourToTime(horaSeleccionada)
     const hora_fin   = hourToTime(horaSeleccionada + 1)
+    const n = repetirSemanas
 
-    const { data, error } = await supabase.from('reservas').insert({
-      cancha_id: id,
-      jugador_id: user.id,
-      fecha,
-      hora_inicio,
-      hora_fin,
-      metodo_pago: metodoPago,
-      monto: cancha.precio_hora,
-      estado: 'pendiente',
-    }).select().single()
+    const creadas = []
+    let ocupadas = 0
+    for (let k = 0; k < n; k++) {
+      const f = new Date(fechas[fechaIdx])
+      f.setDate(f.getDate() + 7 * k)
+      const { data, error } = await supabase.from('reservas').insert({
+        cancha_id: id, jugador_id: user.id, fecha: formatFecha(f),
+        hora_inicio, hora_fin, metodo_pago: metodoPago,
+        monto: cancha.precio_hora, estado: 'pendiente',
+      }).select().single()
 
-    setReservando(false)
-    if (error) {
-      setErrorReserva(
-        error.code === '23505'
-          ? 'Ese turno ya fue reservado. Elegí otro horario.'
-          : `Error al reservar: ${error.message}`
-      )
-    } else {
-      setReservaCreada(data)
-      setModal('success')
-      setHoraSeleccionada(null)
+      if (error) {
+        // Si falla el primer turno por algo que no sea "ocupado", abortamos con mensaje
+        if (k === 0 && creadas.length === 0 && error.code !== '23505') {
+          setReservando(false)
+          setErrorReserva(`Error al reservar: ${error.message}`)
+          return
+        }
+        ocupadas++ // turno ocupado (o no disponible): lo salteamos
+        continue
+      }
+      creadas.push(data)
       // Notificar al dueño por email (silencioso)
       supabase.functions.invoke('notify-reserva', { body: { tipo: 'nueva_reserva', reserva_id: data.id } }).catch(() => {})
     }
+
+    setReservando(false)
+    if (creadas.length === 0) {
+      setErrorReserva('Ese turno ya fue reservado. Elegí otro horario.')
+      return
+    }
+    setReservaCreada(creadas[0])
+    setResumenRecurrente(n > 1 ? { creadas: creadas.length, total: n, ocupadas } : null)
+    setModal('success')
+    setHoraSeleccionada(null)
   }
 
   function waCompartir(reserva) {
@@ -299,6 +312,22 @@ export default function CourtDetailPage() {
                   </div>
                 ))}
 
+                <div className="divider" />
+                <div className="form-group">
+                  <label className="form-label">¿Es un turno fijo?</label>
+                  <select className="form-select" value={repetirSemanas} onChange={e => setRepetirSemanas(Number(e.target.value))}>
+                    <option value={1}>Solo este turno</option>
+                    <option value={2}>Repetir 2 semanas</option>
+                    <option value={4}>Repetir 4 semanas</option>
+                    <option value={8}>Repetir 8 semanas</option>
+                  </select>
+                  {repetirSemanas > 1 && (
+                    <p className="form-hint">
+                      Se reservarán hasta {repetirSemanas} turnos, todos los {DIAS_SEMANA[fechaActual.getDay()]} a las {horaSeleccionada}:00 hs.
+                    </p>
+                  )}
+                </div>
+
                 {metodosPago.length > 0 && (
                   <>
                     <div className="divider" />
@@ -345,7 +374,15 @@ export default function CourtDetailPage() {
             <div className="modal-body" style={{ padding: 32 }}>
               <CheckCircle size={56} style={{ color: 'var(--green)', margin: '0 auto 16px' }} />
               <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>¡Reserva confirmada!</h3>
-              <p style={{ color: 'var(--muted)', fontSize: 14, marginBottom: 24 }}>Tu turno quedó reservado correctamente</p>
+              <p style={{ color: 'var(--muted)', fontSize: 14, marginBottom: resumenRecurrente ? 16 : 24 }}>Tu turno quedó reservado correctamente</p>
+
+              {resumenRecurrente && (
+                <div className="alert alert-info" style={{ marginBottom: 20, textAlign: 'left' }}>
+                  Reservaste <b>{resumenRecurrente.creadas} de {resumenRecurrente.total}</b> turnos fijos.
+                  {resumenRecurrente.ocupadas > 0 && ` ${resumenRecurrente.ocupadas} ya estaban ocupados, así que se saltearon.`}
+                  {' '}Los ves todos en "Mis turnos".
+                </div>
+              )}
 
               <div style={{ background: 'var(--green-50)', borderRadius: 'var(--radius-lg)', padding: 20, marginBottom: 20 }}>
                 <div style={{ fontSize: 12, color: 'var(--green-dark)', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Código de reserva</div>
