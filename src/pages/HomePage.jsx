@@ -1,15 +1,19 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../contexts/AuthContext'
 import { TIPO_DB } from '../lib/tipoCancha'
 import CourtCard from '../components/CourtCard'
-import { Search, SlidersHorizontal, X } from 'lucide-react'
+import { Search, SlidersHorizontal, X, Heart } from 'lucide-react'
 import { useSEO } from '../hooks/useSEO'
 
 const TIPOS_FILTRO = ['Todos', ...Object.keys(TIPO_DB)]
 
 export default function HomePage() {
+  const { user } = useAuth()
   const [canchas, setCanchas] = useState([])
   const [ratings, setRatings] = useState({})
+  const [favoritos, setFavoritos] = useState(new Set())
+  const [soloFavoritos, setSoloFavoritos] = useState(false)
   const [loading, setLoading] = useState(true)
   const [busqueda, setBusqueda] = useState('')
   const [tipoFiltro, setTipoFiltro] = useState('Todos')
@@ -19,6 +23,24 @@ export default function HomePage() {
 
   useSEO({ title: 'Canchas de fútbol en Tandil', description: 'Encontrá y reservá canchas de fútbol en Tandil. Fútbol 5, 6, 7, 8 y 11. Turnos online en segundos.' })
   useEffect(() => { fetchCanchas() }, [])
+
+  useEffect(() => {
+    if (!user) { setFavoritos(new Set()); setSoloFavoritos(false); return }
+    supabase.from('favoritos').select('cancha_id').eq('jugador_id', user.id)
+      .then(({ data }) => setFavoritos(new Set((data || []).map(f => f.cancha_id))))
+  }, [user])
+
+  async function toggleFavorito(canchaId) {
+    if (!user) return
+    const next = new Set(favoritos)
+    if (next.has(canchaId)) {
+      next.delete(canchaId); setFavoritos(next)
+      await supabase.from('favoritos').delete().eq('jugador_id', user.id).eq('cancha_id', canchaId)
+    } else {
+      next.add(canchaId); setFavoritos(next)
+      await supabase.from('favoritos').insert({ jugador_id: user.id, cancha_id: canchaId })
+    }
+  }
 
   async function fetchCanchas() {
     const [{ data: cs }, { data: rs }] = await Promise.all([
@@ -49,7 +71,8 @@ export default function HomePage() {
     const coincideBusqueda = !q || c.nombre.toLowerCase().includes(q) || c.direccion.toLowerCase().includes(q)
     const coincideTipo = tipoFiltro === 'Todos' || c.tipo === TIPO_DB[tipoFiltro]
     const coincidePrecio = !precioMax || c.precio_hora <= precioMaxNum
-    return coincideBusqueda && coincideTipo && coincidePrecio
+    const coincideFav = !soloFavoritos || favoritos.has(c.id)
+    return coincideBusqueda && coincideTipo && coincidePrecio && coincideFav
   })
 
   if (ordenar === 'precio_asc') filtradas = [...filtradas].sort((a, b) => a.precio_hora - b.precio_hora)
@@ -57,10 +80,10 @@ export default function HomePage() {
   else if (ordenar === 'nombre') filtradas = [...filtradas].sort((a, b) => a.nombre.localeCompare(b.nombre))
   else filtradas = [...filtradas].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 
-  const hayFiltrosActivos = tipoFiltro !== 'Todos' || precioMax || busqueda
+  const hayFiltrosActivos = tipoFiltro !== 'Todos' || precioMax || busqueda || soloFavoritos
 
   function limpiarFiltros() {
-    setBusqueda(''); setTipoFiltro('Todos'); setPrecioMax('')
+    setBusqueda(''); setTipoFiltro('Todos'); setPrecioMax(''); setSoloFavoritos(false)
   }
 
   const precioMinDB = canchas.length ? Math.min(...canchas.map(c => c.precio_hora)) : 0
@@ -98,6 +121,14 @@ export default function HomePage() {
           >
             <SlidersHorizontal size={14} /> Filtros {hayFiltrosActivos && <span className="badge badge-green" style={{ fontSize: 10, padding: '1px 6px', marginLeft: 4 }}>!</span>}
           </button>
+
+          {user && (
+            <button onClick={() => setSoloFavoritos(f => !f)}
+              className={`btn btn-sm ${soloFavoritos ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ flexShrink: 0 }}>
+              <Heart size={14} style={{ fill: soloFavoritos ? 'currentColor' : 'none' }} /> Favoritos
+            </button>
+          )}
 
           {/* Tipos rápidos */}
           {TIPOS_FILTRO.map(tipo => (
@@ -180,7 +211,15 @@ export default function HomePage() {
               {precioMax && Number(precioMax) < precioMaxDB && ` · hasta $${Number(precioMax).toLocaleString('es-AR')}/h`}
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-              {filtradas.map(c => <CourtCard key={c.id} cancha={c} rating={ratings[c.id]} />)}
+              {filtradas.map(c => (
+                <CourtCard
+                  key={c.id}
+                  cancha={c}
+                  rating={ratings[c.id]}
+                  esFavorito={favoritos.has(c.id)}
+                  onToggleFavorito={user ? toggleFavorito : undefined}
+                />
+              ))}
             </div>
           </>
         )}

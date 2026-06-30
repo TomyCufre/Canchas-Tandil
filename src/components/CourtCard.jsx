@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { MapPin, Star } from 'lucide-react'
+import { MapPin, Star, Heart } from 'lucide-react'
 import { TIPO_LABEL } from '../lib/tipoCancha'
 
 const TIPO_BADGE = {
@@ -12,7 +12,7 @@ const TIPO_BADGE = {
   indoor: 'badge-gray',
 }
 
-export default function CourtCard({ cancha, rating }) {
+export default function CourtCard({ cancha, rating, esFavorito, onToggleFavorito }) {
   const fotos = cancha.fotos?.length ? cancha.fotos : (cancha.foto_url ? [cancha.foto_url] : [])
   const foto = fotos[0]
   const label = TIPO_LABEL[cancha.tipo] || cancha.tipo
@@ -26,11 +26,25 @@ export default function CourtCard({ cancha, rating }) {
         onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}
       >
         <div style={{
-          height: 180,
+          height: 180, position: 'relative',
           background: foto ? `url(${foto}) center/cover` : 'linear-gradient(135deg, #16a34a22, #16a34a44)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
         }}>
           {!foto && <span style={{ fontSize: 48 }}>⚽</span>}
+          {onToggleFavorito && (
+            <button
+              type="button"
+              onClick={e => { e.preventDefault(); e.stopPropagation(); onToggleFavorito(cancha.id) }}
+              title={esFavorito ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+              style={{
+                position: 'absolute', top: 10, right: 10, width: 34, height: 34, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow)',
+              }}
+            >
+              <Heart size={18} style={{ color: esFavorito ? '#ef4444' : '#94a3b8', fill: esFavorito ? '#ef4444' : 'none' }} />
+            </button>
+          )}
         </div>
         <div style={{ padding: 14 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
