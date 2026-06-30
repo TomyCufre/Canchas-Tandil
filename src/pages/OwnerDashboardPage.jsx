@@ -227,10 +227,17 @@ export default function OwnerDashboardPage() {
   )
 }
 
+function msgConfirmacion(r, nombre) {
+  const horaI = timeToHour(r.hora_inicio)
+  const [y, m, d] = r.fecha.split('-')
+  return `¡Hola ${nombre}! 🎉 Tu turno en *${r.canchas?.nombre}* quedó CONFIRMADO para el ${d}/${m}/${y} a las ${horaI}:00 hs. ¡Te esperamos! (cód. ${r.codigo})`
+}
+
 function ReservasList({ reservas, onRefresh }) {
   const [detalleId, setDetalleId] = useState(null)
   const [perfiles, setPerfiles] = useState({})
   const [accionando, setAccionando] = useState(null)
+  const [avisar, setAvisar] = useState(null) // { reserva, nombre, telefono }
 
   async function verContacto(jugadorId) {
     if (!perfiles[jugadorId]) {
@@ -244,13 +251,20 @@ function ReservasList({ reservas, onRefresh }) {
     setAccionando(reserva.id)
     await supabase.from('reservas').update({ estado: nuevoEstado }).eq('id', reserva.id)
     await notificar(nuevoEstado === 'confirmada' ? 'confirmada' : 'cancelada', reserva.id)
+    // Al confirmar, ofrecemos avisar al jugador por WhatsApp con un toque
+    if (nuevoEstado === 'confirmada') {
+      const { data: p } = await supabase.from('perfiles').select('nombre, telefono').eq('id', reserva.jugador_id).single()
+      if (p?.telefono) setAvisar({ reserva, nombre: p.nombre, telefono: p.telefono })
+    }
     setAccionando(null)
     onRefresh()
   }
 
   function waLink(telefono, texto) {
-    const num = telefono.replace(/\D/g, '')
-    return `https://wa.me/54${num}?text=${encodeURIComponent(texto)}`
+    let num = (telefono || '').replace(/\D/g, '')
+    if (num.startsWith('54')) num = num.slice(2)
+    if (num.startsWith('9')) num = num.slice(1)
+    return `https://wa.me/549${num}?text=${encodeURIComponent(texto)}`
   }
 
   if (!reservas.length) {
@@ -339,6 +353,32 @@ function ReservasList({ reservas, onRefresh }) {
           </div>
         )
       })()}
+
+      {/* Avisar al jugador que su turno fue confirmado */}
+      {avisar && (
+        <div className="modal-overlay" onClick={() => setAvisar(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 380 }}>
+            <div className="modal-header">
+              <h3>Reserva confirmada ✅</h3>
+              <button onClick={() => setAvisar(null)} className="btn btn-ghost btn-sm">✕</button>
+            </div>
+            <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <p style={{ fontSize: 13, color: 'var(--muted)', margin: 0 }}>
+                Avisale a <b>{avisar.nombre}</b> que su turno quedó confirmado. El mensaje ya está listo, solo tenés que tocar enviar:
+              </p>
+              <div style={{ fontSize: 13, background: 'var(--bg)', padding: 12, borderRadius: 'var(--radius)', border: '1px solid var(--border)', lineHeight: 1.5 }}>
+                {msgConfirmacion(avisar.reserva, avisar.nombre)}
+              </div>
+              <a href={waLink(avisar.telefono, msgConfirmacion(avisar.reserva, avisar.nombre))} target="_blank" rel="noopener noreferrer"
+                onClick={() => setTimeout(() => setAvisar(null), 400)}
+                className="btn btn-primary" style={{ textDecoration: 'none', justifyContent: 'center', background: '#25d366', border: 'none' }}>
+                <MessageCircle size={16} /> Enviar por WhatsApp
+              </a>
+              <button onClick={() => setAvisar(null)} className="btn btn-ghost btn-sm">Ahora no</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
