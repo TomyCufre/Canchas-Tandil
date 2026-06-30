@@ -8,6 +8,20 @@ const ROLES = [
   { value: 'dueno', label: 'Dueño', desc: 'Gestionar canchas', emoji: '🏟️' },
 ]
 
+// Normaliza un teléfono argentino a sus 10 dígitos nacionales (área + abonado).
+// Acepta formatos con +54, 9, 0 y 15. Devuelve null si no es válido.
+function normalizarTelefono(raw) {
+  let n = (raw || '').replace(/\D/g, '')
+  if (n.startsWith('54')) n = n.slice(2)   // código de país
+  if (n.startsWith('9')) n = n.slice(1)    // prefijo de celular internacional
+  if (n.startsWith('0')) n = n.slice(1)    // 0 de área
+  // sacar el "15" de celular viejo si quedó después del código de área (2 a 4 dígitos)
+  n = n.replace(/^(\d{2,4})15(\d{6,8})$/, '$1$2')
+  if (n.length !== 10) return null         // Argentina: 10 dígitos nacionales
+  if (/^(\d)\1{9}$/.test(n)) return null    // rechazar todos iguales (0000000000)
+  return n
+}
+
 export default function RegisterPage() {
   const { signUp } = useAuth()
   const navigate = useNavigate()
@@ -24,9 +38,11 @@ export default function RegisterPage() {
     e.preventDefault()
     if (form.password.length < 6) { setError('La contraseña debe tener al menos 6 caracteres'); return }
     if (!form.telefono.trim()) { setError('El teléfono es obligatorio'); return }
+    const telNormalizado = normalizarTelefono(form.telefono)
+    if (!telNormalizado) { setError('Ingresá un número de celular argentino válido (ej: 2494 123456)'); return }
     setError('')
     setLoading(true)
-    const { error, needsConfirmation: confirm } = await signUp(form)
+    const { error, needsConfirmation: confirm } = await signUp({ ...form, telefono: telNormalizado })
     setLoading(false)
     if (error) {
       setError(
@@ -86,8 +102,9 @@ export default function RegisterPage() {
               <input type="password" className="form-input" placeholder="Mínimo 6 caracteres" value={form.password} onChange={set('password')} required />
             </div>
             <div className="form-group">
-              <label className="form-label">Teléfono</label>
-              <input type="tel" className="form-input" placeholder="2494 000000" value={form.telefono} onChange={set('telefono')} required />
+              <label className="form-label">Celular</label>
+              <input type="tel" inputMode="tel" className="form-input" placeholder="2494 123456" value={form.telefono} onChange={set('telefono')} required />
+              <p className="form-hint">Tu celular con código de área, sin el 0 ni el 15. Lo usamos para coordinar la reserva.</p>
             </div>
 
             <div className="form-group">
