@@ -3,7 +3,8 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { TIPO_DB } from '../lib/tipoCancha'
 import CourtCard from '../components/CourtCard'
-import { Search, SlidersHorizontal, X, Heart } from 'lucide-react'
+import CanchasMap from '../components/CanchasMap'
+import { Search, SlidersHorizontal, X, Heart, Map as MapIcon, List } from 'lucide-react'
 import { useSEO } from '../hooks/useSEO'
 
 const TIPOS_FILTRO = ['Todos', ...Object.keys(TIPO_DB)]
@@ -20,6 +21,7 @@ export default function HomePage() {
   const [precioMax, setPrecioMax] = useState('')
   const [ordenar, setOrdenar] = useState('recientes')
   const [mostrarFiltros, setMostrarFiltros] = useState(false)
+  const [vista, setVista] = useState('lista')
 
   useSEO({ title: 'Canchas de fútbol en Tandil', description: 'Encontrá y reservá canchas de fútbol en Tandil. Fútbol 5, 6, 7, 8 y 11. Turnos online en segundos.' })
   useEffect(() => { fetchCanchas() }, [])
@@ -206,21 +208,36 @@ export default function HomePage() {
           </div>
         ) : (
           <>
-            <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 16 }}>
-              {filtradas.length} {filtradas.length === 1 ? 'cancha encontrada' : 'canchas encontradas'}
-              {precioMax && Number(precioMax) < precioMaxDB && ` · hasta $${Number(precioMax).toLocaleString('es-AR')}/h`}
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-              {filtradas.map(c => (
-                <CourtCard
-                  key={c.id}
-                  cancha={c}
-                  rating={ratings[c.id]}
-                  esFavorito={favoritos.has(c.id)}
-                  onToggleFavorito={user ? toggleFavorito : undefined}
-                />
-              ))}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+              <p style={{ color: 'var(--muted)', fontSize: 13, margin: 0 }}>
+                {filtradas.length} {filtradas.length === 1 ? 'cancha encontrada' : 'canchas encontradas'}
+                {precioMax && Number(precioMax) < precioMaxDB && ` · hasta $${Number(precioMax).toLocaleString('es-AR')}/h`}
+              </p>
+              <div style={{ display: 'flex', gap: 4 }}>
+                <button onClick={() => setVista('lista')} className={`btn btn-sm ${vista === 'lista' ? 'btn-primary' : 'btn-secondary'}`}>
+                  <List size={14} /> Lista
+                </button>
+                <button onClick={() => setVista('mapa')} className={`btn btn-sm ${vista === 'mapa' ? 'btn-primary' : 'btn-secondary'}`}>
+                  <MapIcon size={14} /> Mapa
+                </button>
+              </div>
             </div>
+
+            {vista === 'mapa' ? (
+              <CanchasMap canchas={filtradas} />
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+                {filtradas.map(c => (
+                  <CourtCard
+                    key={c.id}
+                    cancha={c}
+                    rating={ratings[c.id]}
+                    esFavorito={favoritos.has(c.id)}
+                    onToggleFavorito={user ? toggleFavorito : undefined}
+                  />
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>
