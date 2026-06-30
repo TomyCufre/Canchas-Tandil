@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { TIPO_LABEL, timeToHour } from '../lib/tipoCancha'
-import { Plus, Edit2, Trash2, Eye, EyeOff, Clock, CalendarCheck, CheckCircle, XCircle, MessageCircle, ChevronLeft, ChevronRight, CalendarDays, Star, MessageSquare } from 'lucide-react'
+import { Plus, Edit2, Trash2, Eye, EyeOff, Clock, CalendarCheck, CheckCircle, XCircle, MessageCircle, ChevronLeft, ChevronRight, CalendarDays, Star, MessageSquare, BarChart3 } from 'lucide-react'
 import StarRating from '../components/StarRating'
 import { useSEO } from '../hooks/useSEO'
 
@@ -135,6 +135,9 @@ export default function OwnerDashboardPage() {
             {pendientes.length > 0 && <span className="badge badge-yellow" style={{ marginLeft: 6 }}>{pendientes.length}</span>}
           </button>
           <button className={`tab-btn ${tab === 'historial' ? 'active' : ''}`} onClick={() => setTab('historial')}>Historial</button>
+          <button className={`tab-btn ${tab === 'stats' ? 'active' : ''}`} onClick={() => setTab('stats')}>
+            <BarChart3 size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />Estadísticas
+          </button>
           <button className={`tab-btn ${tab === 'resenas' ? 'active' : ''}`} onClick={() => setTab('resenas')}>
             <Star size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />Reseñas ({resenas.length})
           </button>
@@ -203,6 +206,10 @@ export default function OwnerDashboardPage() {
 
         {tab === 'calendario' && (
           <CalendarView reservas={reservas} canchas={canchas} onRefresh={fetchData} />
+        )}
+
+        {tab === 'stats' && (
+          <Estadisticas reservas={reservas} />
         )}
 
         {tab === 'resenas' && (
@@ -482,6 +489,82 @@ function CalendarView({ reservas, canchas, onRefresh }) {
           </div>
         )
       })()}
+    </div>
+  )
+}
+
+function Estadisticas({ reservas }) {
+  const activas = reservas.filter(r => r.estado !== 'cancelada')
+  const montoDe = r => Number(r.monto || r.canchas?.precio_hora || 0)
+
+  // Ingresos de los últimos 6 meses
+  const now = new Date()
+  const meses = []
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    meses.push({ key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`, label: MESES_CAL[d.getMonth()].slice(0, 3) })
+  }
+  const ingresoMes = {}
+  meses.forEach(m => { ingresoMes[m.key] = 0 })
+  activas.forEach(r => { const k = r.fecha.slice(0, 7); if (k in ingresoMes) ingresoMes[k] += montoDe(r) })
+  const maxIngreso = Math.max(1, ...meses.map(m => ingresoMes[m.key]))
+
+  // Horarios más reservados
+  const porHora = {}
+  activas.forEach(r => { const h = timeToHour(r.hora_inicio); porHora[h] = (porHora[h] || 0) + 1 })
+  const topHoras = Object.entries(porHora).map(([h, c]) => ({ h: Number(h), c })).sort((a, b) => b.c - a.c).slice(0, 6)
+  const maxHora = Math.max(1, ...topHoras.map(t => t.c))
+
+  const totalIngresos = activas.reduce((s, r) => s + montoDe(r), 0)
+  const ticket = activas.length ? Math.round(totalIngresos / activas.length) : 0
+
+  if (!reservas.length) {
+    return <div className="empty-state"><BarChart3 size={48} /><p>Sin datos todavía</p><span>Las estadísticas aparecen cuando tengas reservas</span></div>
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div className="grid-3">
+        <div className="stat-card"><div className="stat-label">Reservas totales</div><div className="stat-value">{activas.length}</div></div>
+        <div className="stat-card"><div className="stat-label">Ingresos totales</div><div className="stat-value" style={{ color: 'var(--green)' }}>${totalIngresos.toLocaleString('es-AR')}</div></div>
+        <div className="stat-card"><div className="stat-label">Ticket promedio</div><div className="stat-value">${ticket.toLocaleString('es-AR')}</div></div>
+      </div>
+
+      <div className="card" style={{ padding: 20 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>Ingresos por mes</h3>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, height: 170 }}>
+          {meses.map(m => {
+            const v = ingresoMes[m.key]
+            const hpct = (v / maxIngreso) * 100
+            return (
+              <div key={m.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, height: '100%', justifyContent: 'flex-end' }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--muted)' }}>{v > 0 ? `$${(v / 1000).toFixed(0)}k` : ''}</div>
+                <div style={{ width: '100%', maxWidth: 44, height: `${Math.max(hpct, 2)}%`, background: 'var(--green)', borderRadius: '6px 6px 0 0' }} title={`$${v.toLocaleString('es-AR')}`} />
+                <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'capitalize' }}>{m.label}</div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      <div className="card" style={{ padding: 20 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>Horarios más reservados</h3>
+        {topHoras.length === 0 ? (
+          <p style={{ color: 'var(--muted)', fontSize: 13 }}>Sin datos</p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {topHoras.map(t => (
+              <div key={t.h} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 54, fontSize: 13, fontWeight: 600 }}>{t.h}:00</div>
+                <div style={{ flex: 1, background: 'var(--bg)', borderRadius: 99, height: 14, overflow: 'hidden' }}>
+                  <div style={{ width: `${(t.c / maxHora) * 100}%`, background: 'var(--green)', height: '100%', borderRadius: 99 }} />
+                </div>
+                <div style={{ width: 30, fontSize: 12, color: 'var(--muted)', textAlign: 'right' }}>{t.c}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
