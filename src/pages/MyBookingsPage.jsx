@@ -157,6 +157,8 @@ export default function MyBookingsPage() {
               const horaF = timeToHour(r.hora_fin)
               const yaPaso = r.fecha < hoy
               const tieneResena = !!resenas[r.id]
+              // Cancelable solo con 2hs o más de anticipación
+              const cancelable = (new Date(`${r.fecha}T${r.hora_inicio}`) - Date.now()) >= 2 * 3600 * 1000
               return (
                 <div key={r.id} className="card" style={{ padding: 16 }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 10 }}>
@@ -214,9 +216,13 @@ export default function MyBookingsPage() {
                         </a>
                       )}
 
-                      {/* Cancelar */}
+                      {/* Cancelar (solo con 2hs+ de anticipación) */}
                       {r.estado === 'pendiente' && tab === 'proximas' && (
-                        confirmCancel === r.id ? (
+                        !cancelable ? (
+                          <span style={{ fontSize: 11, color: 'var(--muted)' }} title="No se puede cancelar con menos de 2 horas de anticipación">
+                            Cancelación cerrada
+                          </span>
+                        ) : confirmCancel === r.id ? (
                           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                             <button onClick={() => cancelarReserva(r.id)} className="btn btn-danger btn-sm" disabled={cancelando === r.id}>
                               {cancelando === r.id ? '...' : 'Sí, cancelar'}
