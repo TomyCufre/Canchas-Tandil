@@ -43,6 +43,7 @@ export default function CourtDetailPage() {
   const [reservaCreada, setReservaCreada] = useState(null)
   const [resumenRecurrente, setResumenRecurrente] = useState(null)
   const [errorReserva, setErrorReserva] = useState('')
+  const [linkCopiado, setLinkCopiado] = useState(false)
 
   useSEO({
     title: cancha ? `${cancha.nombre} — Reservar turno` : 'Reservar cancha',
@@ -116,6 +117,17 @@ export default function CourtDetailPage() {
     setHoraSeleccionada(null)
   }
 
+  function waCancha() {
+    const link = `${window.location.origin}/canchas/${id}`
+    const msg = `⚽ Mirá esta cancha en Canchas Tandil: *${cancha.nombre}*\n📍 ${cancha.direccion}\n💵 $${Number(cancha.precio_hora).toLocaleString('es-AR')}/h\n\n${link}`
+    return `https://wa.me/?text=${encodeURIComponent(msg)}`
+  }
+
+  function copiarLinkCancha() {
+    navigator.clipboard?.writeText(`${window.location.origin}/canchas/${id}`)
+    setLinkCopiado(true); setTimeout(() => setLinkCopiado(false), 2000)
+  }
+
   function waCompartir(reserva) {
     const horaI = timeToHour(reserva.hora_inicio)
     const horaF = timeToHour(reserva.hora_fin)
@@ -172,6 +184,15 @@ export default function CourtDetailPage() {
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {cancha.acepta_presencial && <div style={{ ...chip, background: '#eff6ff', color: '#1d4ed8' }}><CreditCard size={13} /> Pago en el lugar</div>}
                   {cancha.acepta_online     && <div style={{ ...chip, background: '#eff6ff', color: '#1d4ed8' }}><CreditCard size={13} /> Mercado Pago</div>}
+                </div>
+
+                <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
+                  <a href={waCancha()} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm" style={{ textDecoration: 'none' }}>
+                    <MessageCircle size={14} style={{ color: '#25d366' }} /> Compartir cancha
+                  </a>
+                  <button onClick={copiarLinkCancha} className="btn btn-secondary btn-sm">
+                    {linkCopiado ? <><CheckCircle size={14} /> ¡Link copiado!</> : <><Copy size={14} /> Copiar link</>}
+                  </button>
                 </div>
               </div>
             </div>
