@@ -232,6 +232,12 @@ export default function CourtDetailPage() {
                         </div>
                         {r.comentario && <p style={{ fontSize: 13, color: 'var(--text-light)', lineHeight: 1.5, margin: 0 }}>{r.comentario}</p>}
                         <span style={{ fontSize: 11, color: 'var(--muted)' }}>{new Date(r.created_at).toLocaleDateString('es-AR')}</span>
+                        {r.respuesta && (
+                          <div style={{ marginTop: 8, padding: '8px 12px', background: 'var(--green-50)', borderRadius: 'var(--radius)', borderLeft: '3px solid var(--green)' }}>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--green-dark)', marginBottom: 2 }}>Respuesta del dueño</div>
+                            <p style={{ fontSize: 13, color: 'var(--text-light)', lineHeight: 1.5, margin: 0 }}>{r.respuesta}</p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

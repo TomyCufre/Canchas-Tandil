@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { TIPO_LABEL, timeToHour } from '../lib/tipoCancha'
-import { Plus, Edit2, Trash2, Eye, EyeOff, Clock, CalendarCheck, CheckCircle, XCircle, MessageCircle, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react'
+import { Plus, Edit2, Trash2, Eye, EyeOff, Clock, CalendarCheck, CheckCircle, XCircle, MessageCircle, ChevronLeft, ChevronRight, CalendarDays, Star, MessageSquare } from 'lucide-react'
+import StarRating from '../components/StarRating'
 import { useSEO } from '../hooks/useSEO'
 
 const ESTADO_BADGE = {
@@ -21,6 +22,7 @@ export default function OwnerDashboardPage() {
   const { user } = useAuth()
   const [canchas, setCanchas] = useState([])
   const [reservas, setReservas] = useState([])
+  const [resenas, setResenas] = useState([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('canchas')
   const [confirmDelete, setConfirmDelete] = useState(null)
@@ -36,7 +38,7 @@ export default function OwnerDashboardPage() {
   }, [user])
 
   async function fetchData() {
-    const [{ data: cs }, { data: rs }] = await Promise.all([
+    const [{ data: cs }, { data: rs }, { data: res }] = await Promise.all([
       supabase.from('canchas').select('*').eq('dueno_id', user.id).order('created_at', { ascending: false }),
       supabase.from('reservas')
         .select('*, canchas!inner(nombre, dueno_id, precio_hora)')
@@ -44,9 +46,14 @@ export default function OwnerDashboardPage() {
         .order('fecha', { ascending: false })
         .order('hora_inicio', { ascending: false })
         .limit(200),
+      supabase.from('resenas')
+        .select('*, canchas!inner(nombre, dueno_id), perfiles(nombre)')
+        .eq('canchas.dueno_id', user.id)
+        .order('created_at', { ascending: false }),
     ])
     setCanchas(cs || [])
     setReservas(rs || [])
+    setResenas(res || [])
     setLoading(false)
   }
 
@@ -128,6 +135,9 @@ export default function OwnerDashboardPage() {
             {pendientes.length > 0 && <span className="badge badge-yellow" style={{ marginLeft: 6 }}>{pendientes.length}</span>}
           </button>
           <button className={`tab-btn ${tab === 'historial' ? 'active' : ''}`} onClick={() => setTab('historial')}>Historial</button>
+          <button className={`tab-btn ${tab === 'resenas' ? 'active' : ''}`} onClick={() => setTab('resenas')}>
+            <Star size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />Reseñas ({resenas.length})
+          </button>
         </div>
 
         {tab === 'canchas' && (
@@ -193,6 +203,10 @@ export default function OwnerDashboardPage() {
 
         {tab === 'calendario' && (
           <CalendarView reservas={reservas} canchas={canchas} onRefresh={fetchData} />
+        )}
+
+        {tab === 'resenas' && (
+          <ResenasPanel resenas={resenas} onRefresh={fetchData} />
         )}
 
         {(tab === 'proximas' || tab === 'historial') && (
@@ -468,6 +482,69 @@ function CalendarView({ reservas, canchas, onRefresh }) {
           </div>
         )
       })()}
+    </div>
+  )
+}
+
+function ResenasPanel({ resenas, onRefresh }) {
+  const [editId, setEditId] = useState(null)
+  const [texto, setTexto] = useState('')
+  const [guardando, setGuardando] = useState(false)
+
+  function abrir(r) { setEditId(r.id); setTexto(r.respuesta || '') }
+
+  async function guardar(r, valor) {
+    setGuardando(true)
+    await supabase.rpc('responder_resena', { p_resena_id: r.id, p_respuesta: valor })
+    setGuardando(false); setEditId(null); setTexto(''); onRefresh()
+  }
+
+  if (!resenas.length) {
+    return <div className="empty-state"><Star size={48} /><p>Todavía no tenés reseñas</p><span>Aparecen acá cuando un jugador califica una cancha tuya</span></div>
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {resenas.map(r => (
+        <div key={r.id} className="card" style={{ padding: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+            <div>
+              <span style={{ fontWeight: 600, fontSize: 14 }}>{r.perfiles?.nombre ?? 'Jugador'}</span>
+              <span style={{ color: 'var(--muted)', fontSize: 12, marginLeft: 8 }}>{r.canchas?.nombre}</span>
+            </div>
+            <StarRating value={r.puntuacion} readOnly size={15} />
+          </div>
+          {r.comentario && <p style={{ fontSize: 13, color: 'var(--text-light)', lineHeight: 1.5, margin: '0 0 6px' }}>{r.comentario}</p>}
+          <span style={{ fontSize: 11, color: 'var(--muted)' }}>{new Date(r.created_at).toLocaleDateString('es-AR')}</span>
+
+          {editId === r.id ? (
+            <div style={{ marginTop: 10 }}>
+              <textarea className="form-textarea" rows={2} placeholder="Escribí tu respuesta..." value={texto} onChange={e => setTexto(e.target.value)} />
+              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                <button onClick={() => guardar(r, texto)} className="btn btn-primary btn-sm" disabled={guardando || !texto.trim()}>
+                  {guardando ? 'Guardando...' : 'Publicar respuesta'}
+                </button>
+                <button onClick={() => { setEditId(null); setTexto('') }} className="btn btn-secondary btn-sm">Cancelar</button>
+              </div>
+            </div>
+          ) : r.respuesta ? (
+            <div style={{ marginTop: 10, padding: '8px 12px', background: 'var(--green-50)', borderRadius: 'var(--radius)', borderLeft: '3px solid var(--green)' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--green-dark)', marginBottom: 2 }}>Tu respuesta</div>
+              <p style={{ fontSize: 13, color: 'var(--text-light)', lineHeight: 1.5, margin: '0 0 6px' }}>{r.respuesta}</p>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button onClick={() => abrir(r)} className="btn btn-ghost btn-sm">Editar</button>
+                <button onClick={() => guardar(r, '')} className="btn btn-ghost btn-sm" style={{ color: 'var(--error)' }} disabled={guardando}>Eliminar</button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <button onClick={() => abrir(r)} className="btn btn-secondary btn-sm" style={{ marginTop: 10 }}>
+                <MessageSquare size={14} /> Responder
+              </button>
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   )
 }
