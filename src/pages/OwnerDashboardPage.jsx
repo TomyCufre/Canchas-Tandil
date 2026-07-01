@@ -241,8 +241,8 @@ function ReservasList({ reservas, onRefresh }) {
 
   async function verContacto(jugadorId) {
     if (!perfiles[jugadorId]) {
-      const { data } = await supabase.from('perfiles').select('nombre, telefono').eq('id', jugadorId).single()
-      setPerfiles(p => ({ ...p, [jugadorId]: data }))
+      const { data } = await supabase.rpc('get_contacto_jugador', { p_jugador_id: jugadorId })
+      setPerfiles(p => ({ ...p, [jugadorId]: data?.[0] || { nombre: 'Jugador', telefono: null } }))
     }
     setDetalleId(jugadorId)
   }
@@ -253,7 +253,8 @@ function ReservasList({ reservas, onRefresh }) {
     await notificar(nuevoEstado === 'confirmada' ? 'confirmada' : 'cancelada', reserva.id)
     // Al confirmar, ofrecemos avisar al jugador por WhatsApp con un toque
     if (nuevoEstado === 'confirmada') {
-      const { data: p } = await supabase.from('perfiles').select('nombre, telefono').eq('id', reserva.jugador_id).single()
+      const { data } = await supabase.rpc('get_contacto_jugador', { p_jugador_id: reserva.jugador_id })
+      const p = data?.[0]
       if (p?.telefono) setAvisar({ reserva, nombre: p.nombre, telefono: p.telefono })
     }
     setAccionando(null)

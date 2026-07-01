@@ -28,8 +28,10 @@ export function AuthProvider({ children }) {
   }, [])
 
   async function loadProfile(userId) {
-    const { data } = await supabase.from('perfiles').select('*').eq('id', userId).single()
-    setProfile(data)
+    const { data } = await supabase.from('perfiles').select('id, nombre, rol, avatar_url, created_at').eq('id', userId).single()
+    // El teléfono no es legible directamente (privacidad); se trae por RPC segura
+    const { data: telefono } = await supabase.rpc('get_mi_telefono')
+    setProfile(data ? { ...data, telefono: telefono ?? null } : data)
     setLoading(false)
   }
 
