@@ -23,7 +23,7 @@ export default function RegisterPage() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (form.password.length < 6) { setError('La contraseña debe tener al menos 6 caracteres'); return }
+    if (form.password.length < 8) { setError('La contraseña debe tener al menos 8 caracteres'); return }
     if (!form.telefono.trim()) { setError('El teléfono es obligatorio'); return }
     const telNormalizado = normalizarTelefono(form.telefono)
     if (!telNormalizado) { setError('Ingresá un número de celular argentino válido (ej: 2494 123456)'); return }
@@ -86,7 +86,7 @@ export default function RegisterPage() {
             </div>
             <div className="form-group">
               <label className="form-label">Contraseña</label>
-              <input type="password" className="form-input" placeholder="Mínimo 6 caracteres" value={form.password} onChange={set('password')} required />
+              <input type="password" className="form-input" placeholder="Mínimo 8 caracteres" value={form.password} onChange={set('password')} required />
             </div>
             <div className="form-group">
               <label className="form-label">Celular</label>
