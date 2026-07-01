@@ -6,13 +6,13 @@ import { normalizarTelefono } from '../lib/telefono'
 
 const ROLES = [
   { value: 'jugador', label: 'Jugador', desc: 'Reservar canchas', emoji: '🧑' },
-  { value: 'dueno', label: 'Dueño', desc: 'Gestionar canchas', emoji: '🏟️' },
+  { value: 'dueno', label: 'Dueño', desc: 'Requiere aprobación', emoji: '🏟️' },
 ]
 
 export default function RegisterPage() {
   const { signUp } = useAuth()
   const navigate = useNavigate()
-  const [form, setForm] = useState({ nombre: '', email: '', password: '', telefono: '', rol: 'jugador' })
+  const [form, setForm] = useState({ nombre: '', email: '', password: '', telefono: '', rol: 'jugador', nombreComplejo: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [needsConfirmation, setNeedsConfirmation] = useState(false)
@@ -29,7 +29,14 @@ export default function RegisterPage() {
     if (!telNormalizado) { setError('Ingresá un número de celular argentino válido (ej: 2494 123456)'); return }
     setError('')
     setLoading(true)
-    const { error, needsConfirmation: confirm } = await signUp({ ...form, telefono: telNormalizado })
+    const { error, needsConfirmation: confirm } = await signUp({
+      nombre: form.nombre,
+      email: form.email,
+      password: form.password,
+      telefono: telNormalizado,
+      quiereDueno: form.rol === 'dueno',
+      nombreComplejo: form.nombreComplejo,
+    })
     setLoading(false)
     if (error) {
       setError(
@@ -57,6 +64,11 @@ export default function RegisterPage() {
           <div className="alert alert-info" style={{ textAlign: 'left', marginBottom: 20 }}>
             Si no lo ves, revisá la carpeta de spam.
           </div>
+          {form.rol === 'dueno' && (
+            <div className="alert alert-info" style={{ textAlign: 'left', marginBottom: 20 }}>
+              📋 Tu solicitud para registrar canchas quedó <b>pendiente de aprobación</b>. Vas a poder ingresar como jugador; te habilitamos como dueño cuando la revisemos.
+            </div>
+          )}
           <Link to="/login" className="btn btn-primary btn-full">Ir a Iniciar sesión</Link>
         </div>
       </div>
@@ -115,6 +127,14 @@ export default function RegisterPage() {
                 ))}
               </div>
             </div>
+
+            {form.rol === 'dueno' && (
+              <div className="form-group">
+                <label className="form-label">Nombre de tu complejo / cancha <span style={{ color: 'var(--muted)', fontWeight: 400 }}>(opcional)</span></label>
+                <input className="form-input" placeholder="Ej: Club Nahuel" value={form.nombreComplejo} onChange={set('nombreComplejo')} />
+                <p className="form-hint">Ser dueño requiere aprobación. Mientras tanto podés usar la app como jugador; te avisamos cuando te habilitemos.</p>
+              </div>
+            )}
 
             <button type="submit" className="btn btn-primary btn-full btn-lg" disabled={loading}>
               {loading ? <span className="spinner" style={{ width: 18, height: 18, borderWidth: 2 }} /> : <UserPlus size={16} />}

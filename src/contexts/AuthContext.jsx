@@ -28,7 +28,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   async function loadProfile(userId) {
-    const { data } = await supabase.from('perfiles').select('id, nombre, rol, avatar_url, created_at').eq('id', userId).single()
+    const { data } = await supabase.from('perfiles').select('id, nombre, rol, avatar_url, created_at, es_admin').eq('id', userId).single()
     // El teléfono no es legible directamente (privacidad); se trae por RPC segura
     const { data: telefono } = await supabase.rpc('get_mi_telefono')
     setProfile(data ? { ...data, telefono: telefono ?? null } : data)
@@ -42,12 +42,19 @@ export function AuthProvider({ children }) {
 
   // Datos del perfil van como metadata → el trigger on_auth_user_created los usa
   // para insertar en `perfiles` con security definer (evita problemas de RLS con confirmación de email)
-  async function signUp({ nombre, email, password, telefono, rol }) {
+  async function signUp({ nombre, email, password, telefono, quiereDueno, nombreComplejo }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { nombre, telefono: telefono || null, rol },
+        data: {
+          nombre,
+          telefono: telefono || null,
+          // El rol NUNCA se asigna desde el cliente: la base siempre crea "jugador".
+          // Si pide ser dueño, se registra una solicitud pendiente de aprobación.
+          quiere_dueno: quiereDueno ? 'true' : 'false',
+          nombre_complejo: nombreComplejo || null,
+        },
       },
     })
     if (error) return { error, needsConfirmation: false }

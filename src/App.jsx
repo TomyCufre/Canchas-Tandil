@@ -14,6 +14,7 @@ import CourtFormPage from './pages/CourtFormPage'
 import ManageSchedulePage from './pages/ManageSchedulePage'
 import ProfilePage from './pages/ProfilePage'
 import ShareReservaPage from './pages/ShareReservaPage'
+import AdminPage from './pages/AdminPage'
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/canchas/:id" element={<CourtDetailPage />} />
           <Route path="/reserva/:codigo" element={<ShareReservaPage />} />
           <Route path="/perfil" element={<ProfilePage />} />
+          <Route path="/admin" element={<AdminPage />} />
 
           <Route path="/mis-turnos" element={
             <ProtectedRoute rol="jugador">

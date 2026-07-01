@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { LogOut, LayoutDashboard, Calendar, Home, UserCircle } from 'lucide-react'
+import { LogOut, LayoutDashboard, Calendar, Home, UserCircle, ShieldCheck } from 'lucide-react'
 
 export default function Navbar() {
   const { profile, signOut } = useAuth()
@@ -50,6 +50,12 @@ export default function Navbar() {
               <Link to="/panel" className="btn btn-ghost btn-sm">
                 <LayoutDashboard size={15} />
                 <span className="hide-mobile">Panel</span>
+              </Link>
+            )}
+            {profile.es_admin && (
+              <Link to="/admin" className="btn btn-ghost btn-sm" style={{ color: 'var(--green)' }}>
+                <ShieldCheck size={15} />
+                <span className="hide-mobile">Admin</span>
               </Link>
             )}
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, borderLeft: '1px solid var(--border)', paddingLeft: 8 }}>
