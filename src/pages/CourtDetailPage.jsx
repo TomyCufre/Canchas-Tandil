@@ -199,10 +199,15 @@ export default function CourtDetailPage() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div className="card" style={{ padding: 20, textAlign: 'center' }}>
-                <div style={{ color: 'var(--muted)', fontSize: 12, marginBottom: 4 }}>Precio por hora</div>
+                <div style={{ color: 'var(--muted)', fontSize: 12, marginBottom: 4 }}>Precio por turno (1 hora)</div>
                 <div style={{ fontSize: 32, fontWeight: 800, color: 'var(--green)' }}>
                   ${Number(cancha.precio_hora).toLocaleString('es-AR')}
                 </div>
+                {cancha.precio_por_persona && (
+                  <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
+                    ≈ ${Number(cancha.precio_por_persona).toLocaleString('es-AR')} por persona
+                  </div>
+                )}
               </div>
 
               <div className="card" style={{ overflow: 'hidden' }}>

@@ -28,7 +28,7 @@ export default function CourtFormPage() {
   const fileInputRef = useRef()
 
   const [form, setForm] = useState({
-    nombre: '', direccion: '', tipo: 'futbol5', precio_hora: '', descripcion: '',
+    nombre: '', direccion: '', tipo: 'futbol5', precio_hora: '', precio_por_persona: '', descripcion: '',
     tiene_vestuario: false, tiene_estacionamiento: false, tiene_iluminacion: true,
     acepta_presencial: true, acepta_online: false,
     fotos: [], latitud: null, longitud: null, maps_url: '',
@@ -47,7 +47,8 @@ export default function CourtFormPage() {
     if (!data) { navigate('/panel'); return }
     setForm({
       nombre: data.nombre, direccion: data.direccion, tipo: data.tipo,
-      precio_hora: data.precio_hora, descripcion: data.descripcion || '',
+      precio_hora: data.precio_hora, precio_por_persona: data.precio_por_persona || '',
+      descripcion: data.descripcion || '',
       tiene_vestuario: data.tiene_vestuario || false,
       tiene_estacionamiento: data.tiene_estacionamiento || false,
       tiene_iluminacion: data.tiene_iluminacion !== false,
@@ -128,7 +129,9 @@ export default function CourtFormPage() {
     setSaving(true)
     const payload = {
       dueno_id: user.id, nombre: form.nombre.trim(), direccion: form.direccion.trim(),
-      tipo: form.tipo, precio_hora: Number(form.precio_hora), descripcion: form.descripcion.trim(),
+      tipo: form.tipo, precio_hora: Number(form.precio_hora),
+      precio_por_persona: form.precio_por_persona ? Number(form.precio_por_persona) : null,
+      descripcion: form.descripcion.trim(),
       tiene_vestuario: form.tiene_vestuario, tiene_estacionamiento: form.tiene_estacionamiento,
       tiene_iluminacion: form.tiene_iluminacion, acepta_presencial: form.acepta_presencial,
       acepta_online: form.acepta_online, fotos: form.fotos,
@@ -179,8 +182,14 @@ export default function CourtFormPage() {
                 </select>
               </div>
               <div className="form-group">
-                <label className="form-label">Precio por hora (ARS) *</label>
-                <input type="number" min="1" className="form-input" placeholder="Ej: 15000" value={form.precio_hora} onChange={e => setField('precio_hora', e.target.value)} required />
+                <label className="form-label">Precio por turno (1 hora, ARS) *</label>
+                <input type="number" min="1" className="form-input" placeholder="Ej: 60000" value={form.precio_hora} onChange={e => setField('precio_hora', e.target.value)} required />
+                <p className="form-hint">Lo que se cobra por reservar el turno completo.</p>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Precio por persona <span style={{ color: 'var(--muted)', fontWeight: 400 }}>(opcional)</span></label>
+                <input type="number" min="1" className="form-input" placeholder="Ej: 5000" value={form.precio_por_persona} onChange={e => setField('precio_por_persona', e.target.value)} />
+                <p className="form-hint">Solo como referencia para el jugador. No reemplaza al precio del turno.</p>
               </div>
               <div className="form-group">
                 <label className="form-label">Descripción</label>

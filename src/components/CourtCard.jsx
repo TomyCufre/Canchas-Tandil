@@ -77,8 +77,14 @@ export default function CourtCard({ cancha, rating, esFavorito, onToggleFavorito
               {cancha.tiene_vestuario && <span title="Vestuario">🚿</span>}
               {cancha.tiene_estacionamiento && <span title="Estacionamiento">🅿️</span>}
             </div>
-            <div style={{ fontWeight: 700, color: 'var(--green)', fontSize: 15 }}>
-              ${Number(cancha.precio_hora).toLocaleString('es-AR')}/h
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontWeight: 700, color: 'var(--green)', fontSize: 15 }}>
+                ${Number(cancha.precio_hora).toLocaleString('es-AR')}
+                <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--muted)' }}> /turno</span>
+              </div>
+              {cancha.precio_por_persona && (
+                <div style={{ fontSize: 11, color: 'var(--muted)' }}>≈ ${Number(cancha.precio_por_persona).toLocaleString('es-AR')} por persona</div>
+              )}
             </div>
           </div>
         </div>
