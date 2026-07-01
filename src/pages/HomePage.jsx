@@ -223,7 +223,18 @@ export default function HomePage() {
 
         {/* Resultados */}
         {loading ? (
-          <div className="loading-center"><div className="spinner" /></div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="card">
+                <div className="skeleton" style={{ height: 180, borderRadius: 0 }} />
+                <div style={{ padding: 14 }}>
+                  <div className="skeleton" style={{ height: 16, width: '70%', marginBottom: 10 }} />
+                  <div className="skeleton" style={{ height: 12, width: '50%', marginBottom: 14 }} />
+                  <div className="skeleton" style={{ height: 20, width: '40%' }} />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : filtradas.length === 0 ? (
           <div className="empty-state">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

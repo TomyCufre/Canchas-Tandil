@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { MapPin, Star, Heart } from 'lucide-react'
+import { MapPin, Star, Heart, Lightbulb, ShirtIcon, Car } from 'lucide-react'
 import { TIPO_LABEL } from '../lib/tipoCancha'
 
 const TIPO_BADGE = {
@@ -73,9 +73,9 @@ export default function CourtCard({ cancha, rating, esFavorito, onToggleFavorito
             )}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--muted)', fontSize: 12 }}>
-              {cancha.tiene_iluminacion && <span title="Iluminación">💡</span>}
-              {cancha.tiene_vestuario && <span title="Vestuario">🚿</span>}
-              {cancha.tiene_estacionamiento && <span title="Estacionamiento">🅿️</span>}
+              {cancha.tiene_iluminacion && <span title="Iluminación" style={{ display: 'inline-flex' }}><Lightbulb size={14} /></span>}
+              {cancha.tiene_vestuario && <span title="Vestuario" style={{ display: 'inline-flex' }}><ShirtIcon size={14} /></span>}
+              {cancha.tiene_estacionamiento && <span title="Estacionamiento" style={{ display: 'inline-flex' }}><Car size={14} /></span>}
             </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontWeight: 700, color: 'var(--green)', fontSize: 15 }}>
