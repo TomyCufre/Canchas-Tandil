@@ -555,6 +555,19 @@ function Estadisticas({ reservas }) {
   const topHoras = Object.entries(porHora).map(([h, c]) => ({ h: Number(h), c })).sort((a, b) => b.c - a.c).slice(0, 6)
   const maxHora = Math.max(1, ...topHoras.map(t => t.c))
 
+  // Ranking de canchas: alquileres, ingresos y desglose por mes
+  const porCancha = {}
+  activas.forEach(r => {
+    const cid = r.cancha_id
+    if (!porCancha[cid]) porCancha[cid] = { id: cid, nombre: r.canchas?.nombre || 'Cancha', count: 0, ingresos: 0, porMes: {} }
+    porCancha[cid].count += 1
+    porCancha[cid].ingresos += montoDe(r)
+    const mk = r.fecha.slice(0, 7)
+    porCancha[cid].porMes[mk] = (porCancha[cid].porMes[mk] || 0) + 1
+  })
+  const ranking = Object.values(porCancha).sort((a, b) => b.count - a.count)
+  const maxCount = Math.max(1, ...ranking.map(c => c.count))
+
   const totalIngresos = activas.reduce((s, r) => s + montoDe(r), 0)
   const ticket = activas.length ? Math.round(totalIngresos / activas.length) : 0
 
@@ -571,6 +584,27 @@ function Estadisticas({ reservas }) {
       </div>
 
       <div className="card" style={{ padding: 20 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>Ranking de canchas</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {ranking.map((c, i) => (
+            <div key={c.id}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4, gap: 8 }}>
+                <span style={{ fontSize: 13, fontWeight: 600 }}>
+                  <span style={{ color: 'var(--muted)', marginRight: 6 }}>{i + 1}.</span>{c.nombre}
+                </span>
+                <span style={{ fontSize: 12, color: 'var(--muted)', whiteSpace: 'nowrap' }}>
+                  {c.count} {c.count === 1 ? 'alquiler' : 'alquileres'} · <b style={{ color: 'var(--green)' }}>${c.ingresos.toLocaleString('es-AR')}</b>
+                </span>
+              </div>
+              <div style={{ background: 'var(--bg)', borderRadius: 99, height: 10, overflow: 'hidden' }}>
+                <div style={{ width: `${(c.count / maxCount) * 100}%`, background: 'var(--green)', height: '100%', borderRadius: 99 }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="card" style={{ padding: 20 }}>
         <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>Ingresos por mes</h3>
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, height: 170 }}>
           {meses.map(m => {
@@ -584,6 +618,33 @@ function Estadisticas({ reservas }) {
               </div>
             )
           })}
+        </div>
+      </div>
+
+      <div className="card" style={{ padding: 20 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>Alquileres por mes por cancha</h3>
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Cancha</th>
+                {meses.map(m => <th key={m.key} style={{ textAlign: 'center', textTransform: 'capitalize' }}>{m.label}</th>)}
+                <th style={{ textAlign: 'center' }}>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ranking.map(c => {
+                const totalMeses = meses.reduce((s, m) => s + (c.porMes[m.key] || 0), 0)
+                return (
+                  <tr key={c.id}>
+                    <td style={{ fontWeight: 500 }}>{c.nombre}</td>
+                    {meses.map(m => <td key={m.key} style={{ textAlign: 'center' }}>{c.porMes[m.key] || 0}</td>)}
+                    <td style={{ textAlign: 'center', fontWeight: 700 }}>{totalMeses}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
 
