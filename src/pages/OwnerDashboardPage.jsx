@@ -535,6 +535,7 @@ function CalendarView({ reservas, canchas, onRefresh }) {
 
 function Estadisticas({ reservas }) {
   const activas = reservas.filter(r => r.estado !== 'cancelada')
+  const canceladas = reservas.filter(r => r.estado === 'cancelada')
   const montoDe = r => Number(r.monto || r.canchas?.precio_hora || 0)
 
   // Ingresos de los últimos 6 meses
@@ -577,10 +578,27 @@ function Estadisticas({ reservas }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div className="grid-3">
-        <div className="stat-card"><div className="stat-label">Reservas totales</div><div className="stat-value">{activas.length}</div></div>
-        <div className="stat-card"><div className="stat-label">Ingresos totales</div><div className="stat-value" style={{ color: 'var(--green)' }}>${totalIngresos.toLocaleString('es-AR')}</div></div>
-        <div className="stat-card"><div className="stat-label">Ticket promedio</div><div className="stat-value">${ticket.toLocaleString('es-AR')}</div></div>
+      <div className="grid-4">
+        <div className="stat-card">
+          <div className="stat-label">Reservados con éxito</div>
+          <div className="stat-value" style={{ color: 'var(--green)' }}>{activas.length}</div>
+          <div className="stat-sub">turnos</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Dados de baja</div>
+          <div className="stat-value" style={{ color: 'var(--error)' }}>{canceladas.length}</div>
+          <div className="stat-sub">{reservas.length > 0 ? `${Math.round((canceladas.length / reservas.length) * 100)}% del total` : 'turnos'}</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Ingresos totales</div>
+          <div className="stat-value" style={{ color: 'var(--green)' }}>${totalIngresos.toLocaleString('es-AR')}</div>
+          <div className="stat-sub">estimado</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Ticket promedio</div>
+          <div className="stat-value">${ticket.toLocaleString('es-AR')}</div>
+          <div className="stat-sub">por turno</div>
+        </div>
       </div>
 
       <div className="card" style={{ padding: 20 }}>
