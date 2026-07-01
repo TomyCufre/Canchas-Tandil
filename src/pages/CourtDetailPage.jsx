@@ -229,49 +229,6 @@ export default function CourtDetailPage() {
             </div>
           </div>
 
-          {/* Reseñas */}
-          {resenas.length > 0 && (() => {
-            const prom = (resenas.reduce((s, r) => s + r.puntuacion, 0) / resenas.length).toFixed(1)
-            return (
-              <div className="card" style={{ padding: 20 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                  <Star size={18} style={{ color: '#f59e0b', fill: '#f59e0b' }} />
-                  <h2 style={{ fontSize: 16, fontWeight: 600 }}>
-                    {prom} <span style={{ color: 'var(--muted)', fontWeight: 400, fontSize: 14 }}>({resenas.length} reseña{resenas.length !== 1 ? 's' : ''})</span>
-                  </h2>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  {resenas.map(r => (
-                    <div key={r.id} style={{ display: 'flex', gap: 12 }}>
-                      <div style={{
-                        width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
-                        background: r.perfiles?.avatar_url ? `url(${r.perfiles.avatar_url}) center/cover` : 'var(--green-50)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 16, border: '1px solid var(--border)',
-                      }}>
-                        {!r.perfiles?.avatar_url && '👤'}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                          <span style={{ fontWeight: 600, fontSize: 13 }}>{r.perfiles?.nombre ?? 'Jugador'}</span>
-                          <StarRating value={r.puntuacion} readOnly size={14} />
-                        </div>
-                        {r.comentario && <p style={{ fontSize: 13, color: 'var(--text-light)', lineHeight: 1.5, margin: 0 }}>{r.comentario}</p>}
-                        <span style={{ fontSize: 11, color: 'var(--muted)' }}>{new Date(r.created_at).toLocaleDateString('es-AR')}</span>
-                        {r.respuesta && (
-                          <div style={{ marginTop: 8, padding: '8px 12px', background: 'var(--green-50)', borderRadius: 'var(--radius)', borderLeft: '3px solid var(--green)' }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--green-dark)', marginBottom: 2 }}>Respuesta del dueño</div>
-                            <p style={{ fontSize: 13, color: 'var(--text-light)', lineHeight: 1.5, margin: 0 }}>{r.respuesta}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )
-          })()}
-
           {/* Reservas */}
           <div className="card" style={{ padding: 20 }}>
             <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>
@@ -319,6 +276,49 @@ export default function CourtDetailPage() {
               </p>
             )}
           </div>
+
+          {/* Reseñas */}
+          {resenas.length > 0 && (() => {
+            const prom = (resenas.reduce((s, r) => s + r.puntuacion, 0) / resenas.length).toFixed(1)
+            return (
+              <div className="card" style={{ padding: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                  <Star size={18} style={{ color: '#f59e0b', fill: '#f59e0b' }} />
+                  <h2 style={{ fontSize: 16, fontWeight: 600 }}>
+                    {prom} <span style={{ color: 'var(--muted)', fontWeight: 400, fontSize: 14 }}>({resenas.length} reseña{resenas.length !== 1 ? 's' : ''})</span>
+                  </h2>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  {resenas.map(r => (
+                    <div key={r.id} style={{ display: 'flex', gap: 12 }}>
+                      <div style={{
+                        width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+                        background: r.perfiles?.avatar_url ? `url(${r.perfiles.avatar_url}) center/cover` : 'var(--green-50)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 16, border: '1px solid var(--border)',
+                      }}>
+                        {!r.perfiles?.avatar_url && '👤'}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                          <span style={{ fontWeight: 600, fontSize: 13 }}>{r.perfiles?.nombre ?? 'Jugador'}</span>
+                          <StarRating value={r.puntuacion} readOnly size={14} />
+                        </div>
+                        {r.comentario && <p style={{ fontSize: 13, color: 'var(--text-light)', lineHeight: 1.5, margin: 0 }}>{r.comentario}</p>}
+                        <span style={{ fontSize: 11, color: 'var(--muted)' }}>{new Date(r.created_at).toLocaleDateString('es-AR')}</span>
+                        {r.respuesta && (
+                          <div style={{ marginTop: 8, padding: '8px 12px', background: 'var(--green-50)', borderRadius: 'var(--radius)', borderLeft: '3px solid var(--green)' }}>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--green-dark)', marginBottom: 2 }}>Respuesta del dueño</div>
+                            <p style={{ fontSize: 13, color: 'var(--text-light)', lineHeight: 1.5, margin: 0 }}>{r.respuesta}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })()}
         </div>
       </div>
 
