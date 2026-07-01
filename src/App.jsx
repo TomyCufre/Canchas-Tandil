@@ -15,6 +15,7 @@ import ManageSchedulePage from './pages/ManageSchedulePage'
 import ProfilePage from './pages/ProfilePage'
 import ShareReservaPage from './pages/ShareReservaPage'
 import AdminPage from './pages/AdminPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/canchas/:id" element={<CourtDetailPage />} />
           <Route path="/reserva/:codigo" element={<ShareReservaPage />} />
           <Route path="/perfil" element={<ProfilePage />} />
