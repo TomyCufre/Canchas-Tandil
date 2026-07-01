@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { TIPO_LABEL, hourToTime, timeToHour } from '../lib/tipoCancha'
 import PhotoGallery from '../components/PhotoGallery'
 import TimeSlotGrid from '../components/TimeSlotGrid'
-import { MapPin, Clock, CreditCard, Car, Lightbulb, ShirtIcon, X, CheckCircle, Copy, ExternalLink, MessageCircle, Star } from 'lucide-react'
+import { MapPin, Clock, CreditCard, Car, Lightbulb, ShirtIcon, X, CheckCircle, Copy, ExternalLink, MessageCircle, Star, ArrowLeft } from 'lucide-react'
 import StarRating from '../components/StarRating'
 import { useSEO } from '../hooks/useSEO'
 
@@ -160,6 +160,9 @@ export default function CourtDetailPage() {
   return (
     <div className="page">
       <div className="container">
+        <button onClick={() => navigate(-1)} className="btn btn-ghost btn-sm" style={{ marginBottom: 16 }}>
+          <ArrowLeft size={16} /> Volver
+        </button>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 24 }}>
 
           <div className="court-detail-grid">

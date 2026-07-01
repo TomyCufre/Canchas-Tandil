@@ -199,17 +199,17 @@ export default function MyBookingsPage() {
                     <div style={{ display: 'flex', gap: 6 }}>
                       {/* Compartir */}
                       <a href={`/reserva/${r.codigo}`} target="_blank" rel="noopener noreferrer"
-                        className="btn btn-ghost btn-sm" title="Ver página de reserva">
+                        className="btn btn-ghost btn-sm" title="Ver página de reserva" aria-label="Ver página de reserva">
                         <Share2 size={14} />
                       </a>
                       <a href={waCompartir(r)} target="_blank" rel="noopener noreferrer"
-                        className="btn btn-ghost btn-sm" title="Compartir por WhatsApp" style={{ color: '#25d366' }}>
+                        className="btn btn-ghost btn-sm" title="Compartir por WhatsApp" aria-label="Compartir por WhatsApp" style={{ color: '#25d366' }}>
                         <MessageCircle size={14} />
                       </a>
                       {/* Recordatorio: agregar al calendario (solo turnos futuros vigentes) */}
                       {!yaPaso && r.estado !== 'cancelada' && (
                         <a href={googleCalLink(r)} target="_blank" rel="noopener noreferrer"
-                          className="btn btn-ghost btn-sm" title="Agregar al calendario" style={{ color: 'var(--green)' }}>
+                          className="btn btn-ghost btn-sm" title="Agregar al calendario" aria-label="Agregar al calendario" style={{ color: 'var(--green)' }}>
                           <CalendarPlus size={14} />
                         </a>
                       )}
@@ -224,7 +224,7 @@ export default function MyBookingsPage() {
                             <button onClick={() => setConfirmCancel(null)} className="btn btn-secondary btn-sm">No</button>
                           </div>
                         ) : (
-                          <button onClick={() => setConfirmCancel(r.id)} className="btn btn-ghost btn-sm" style={{ color: 'var(--error)' }}>
+                          <button onClick={() => setConfirmCancel(r.id)} className="btn btn-ghost btn-sm" title="Cancelar turno" aria-label="Cancelar turno" style={{ color: 'var(--error)' }}>
                             <X size={14} />
                           </button>
                         )

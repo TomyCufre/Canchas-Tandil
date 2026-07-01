@@ -36,6 +36,7 @@ export default function CourtCard({ cancha, rating, esFavorito, onToggleFavorito
               type="button"
               onClick={e => { e.preventDefault(); e.stopPropagation(); onToggleFavorito(cancha.id) }}
               title={esFavorito ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+              aria-label={esFavorito ? 'Quitar de favoritos' : 'Agregar a favoritos'}
               style={{
                 position: 'absolute', top: 10, right: 10, width: 34, height: 34, borderRadius: '50%',
                 background: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer',
