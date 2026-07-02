@@ -6,6 +6,7 @@ import { timeToHour } from '../lib/tipoCancha'
 import { Calendar, X, Share2, Star, MessageCircle, CalendarPlus } from 'lucide-react'
 import StarRating from '../components/StarRating'
 import { useSEO } from '../hooks/useSEO'
+import { fechaLocal } from '../lib/fecha'
 
 const ESTADO_BADGE = {
   pendiente: 'badge-yellow', confirmada: 'badge-green',
@@ -116,7 +117,7 @@ export default function MyBookingsPage() {
     return `https://wa.me/?text=${encodeURIComponent(msg)}`
   }
 
-  const hoy = new Date().toISOString().split('T')[0]
+  const hoy = fechaLocal()
   const proximas = reservas.filter(r => r.fecha >= hoy && r.estado !== 'cancelada')
   const pasadas  = reservas.filter(r => r.fecha < hoy || r.estado === 'cancelada')
   const lista = tab === 'proximas' ? proximas : pasadas

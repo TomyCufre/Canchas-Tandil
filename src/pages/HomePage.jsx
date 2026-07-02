@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { TIPO_DB } from '../lib/tipoCancha'
 import CourtCard from '../components/CourtCard'
-import CanchasMap from '../components/CanchasMap'
 import { Search, SlidersHorizontal, X, Heart, Map as MapIcon, List } from 'lucide-react'
 import { useSEO } from '../hooks/useSEO'
+
+// El mapa (con Leaflet) se carga recién cuando el usuario abre la vista de mapa
+const CanchasMap = lazy(() => import('../components/CanchasMap'))
 
 const TIPOS_FILTRO = ['Todos', ...Object.keys(TIPO_DB)]
 
@@ -274,7 +276,9 @@ export default function HomePage() {
             )}
 
             {vista === 'mapa' ? (
-              <CanchasMap canchas={filtradas} />
+              <Suspense fallback={<div className="loading-center"><div className="spinner" /></div>}>
+                <CanchasMap canchas={filtradas} />
+              </Suspense>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
                 {filtradas.map(c => (

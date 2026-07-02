@@ -92,13 +92,15 @@ export default function CourtDetailPage() {
       }).select().single()
 
       if (error) {
-        // Si falla el primer turno por algo que no sea "ocupado", abortamos con mensaje
-        if (k === 0 && creadas.length === 0 && error.code !== '23505') {
+        // 23505 = ya reservado · P0001 = bloqueado/no disponible → salteamos ese turno.
+        // Cualquier otro error en el primer turno sí lo mostramos.
+        const noDisponible = error.code === '23505' || error.code === 'P0001'
+        if (k === 0 && creadas.length === 0 && !noDisponible) {
           setReservando(false)
           setErrorReserva(`Error al reservar: ${error.message}`)
           return
         }
-        ocupadas++ // turno ocupado (o no disponible): lo salteamos
+        ocupadas++
         continue
       }
       creadas.push(data)

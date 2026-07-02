@@ -2,19 +2,25 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
+import { fechaLocal } from '../lib/fecha'
 import { LogOut, LayoutDashboard, Calendar, Home, UserCircle, ShieldCheck, Bell } from 'lucide-react'
 
 export default function Navbar() {
-  const { profile, signOut } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
   const [pendientes, setPendientes] = useState(0)
 
-  // Contador de reservas pendientes para el dueño (con actualización en vivo)
+  // Contador de reservas pendientes para el dueño: solo de SUS canchas y de fechas futuras
   useEffect(() => {
-    if (profile?.rol !== 'dueno') { setPendientes(0); return }
+    if (profile?.rol !== 'dueno' || !user) { setPendientes(0); return }
     let cancelado = false
     const fetchPendientes = async () => {
-      const { count } = await supabase.from('reservas').select('id', { count: 'exact', head: true }).eq('estado', 'pendiente')
+      const { count } = await supabase
+        .from('reservas')
+        .select('id, canchas!inner(dueno_id)', { count: 'exact', head: true })
+        .eq('canchas.dueno_id', user.id)
+        .eq('estado', 'pendiente')
+        .gte('fecha', fechaLocal())
       if (!cancelado) setPendientes(count || 0)
     }
     fetchPendientes()
@@ -22,7 +28,7 @@ export default function Navbar() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'reservas' }, fetchPendientes)
       .subscribe()
     return () => { cancelado = true; supabase.removeChannel(channel) }
-  }, [profile])
+  }, [profile, user])
 
   async function handleSignOut() {
     await signOut()

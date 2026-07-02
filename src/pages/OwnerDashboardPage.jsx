@@ -6,6 +6,7 @@ import { TIPO_LABEL, timeToHour } from '../lib/tipoCancha'
 import { Plus, Edit2, Trash2, Eye, EyeOff, Clock, CalendarCheck, CheckCircle, XCircle, MessageCircle, ChevronLeft, ChevronRight, CalendarDays, Star, MessageSquare, BarChart3, Download } from 'lucide-react'
 import StarRating from '../components/StarRating'
 import { useSEO } from '../hooks/useSEO'
+import { fechaLocal } from '../lib/fecha'
 
 const ESTADO_BADGE = {
   pendiente: 'badge-yellow', confirmada: 'badge-green',
@@ -74,8 +75,8 @@ export default function OwnerDashboardPage() {
     fetchData()
   }
 
-  const hoy = new Date().toISOString().split('T')[0]
-  const hace30 = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString().split('T')[0]
+  const hoy = fechaLocal()
+  const hace30 = fechaLocal(new Date(Date.now() - 30 * 24 * 3600 * 1000))
 
   const reservasHoy = reservas.filter(r => r.fecha === hoy && r.estado !== 'cancelada')
   const ingresosHoy = reservasHoy.reduce((s, r) => s + Number(r.monto || r.canchas?.precio_hora || 0), 0)
