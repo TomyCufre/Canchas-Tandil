@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://canchas-tandil.vercel.app/sitemap.xml
