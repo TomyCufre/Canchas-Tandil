@@ -1,10 +1,28 @@
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { LogOut, LayoutDashboard, Calendar, Home, UserCircle, ShieldCheck } from 'lucide-react'
+import { supabase } from '../lib/supabase'
+import { LogOut, LayoutDashboard, Calendar, Home, UserCircle, ShieldCheck, Bell } from 'lucide-react'
 
 export default function Navbar() {
   const { profile, signOut } = useAuth()
   const navigate = useNavigate()
+  const [pendientes, setPendientes] = useState(0)
+
+  // Contador de reservas pendientes para el dueño (con actualización en vivo)
+  useEffect(() => {
+    if (profile?.rol !== 'dueno') { setPendientes(0); return }
+    let cancelado = false
+    const fetchPendientes = async () => {
+      const { count } = await supabase.from('reservas').select('id', { count: 'exact', head: true }).eq('estado', 'pendiente')
+      if (!cancelado) setPendientes(count || 0)
+    }
+    fetchPendientes()
+    const channel = supabase.channel('nav-pendientes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reservas' }, fetchPendientes)
+      .subscribe()
+    return () => { cancelado = true; supabase.removeChannel(channel) }
+  }, [profile])
 
   async function handleSignOut() {
     await signOut()
@@ -47,10 +65,22 @@ export default function Navbar() {
               </Link>
             )}
             {profile.rol === 'dueno' && (
-              <Link to="/panel" className="btn btn-ghost btn-sm">
-                <LayoutDashboard size={15} />
-                <span className="hide-mobile">Panel</span>
-              </Link>
+              <>
+                <Link to="/panel" className="btn btn-ghost btn-sm" title="Reservas pendientes" style={{ position: 'relative' }}>
+                  <Bell size={16} />
+                  {pendientes > 0 && (
+                    <span style={{
+                      position: 'absolute', top: 0, right: 0, background: 'var(--error)', color: '#fff',
+                      fontSize: 9, fontWeight: 700, minWidth: 16, height: 16, borderRadius: 8,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px',
+                    }}>{pendientes > 99 ? '99+' : pendientes}</span>
+                  )}
+                </Link>
+                <Link to="/panel" className="btn btn-ghost btn-sm">
+                  <LayoutDashboard size={15} />
+                  <span className="hide-mobile">Panel</span>
+                </Link>
+              </>
             )}
             {profile.es_admin && (
               <Link to="/admin" className="btn btn-ghost btn-sm" style={{ color: 'var(--green)' }}>

@@ -121,6 +121,14 @@ export default function MyBookingsPage() {
   const pasadas  = reservas.filter(r => r.fecha < hoy || r.estado === 'cancelada')
   const lista = tab === 'proximas' ? proximas : pasadas
 
+  // Estadísticas del jugador (sobre reservas no canceladas)
+  const noCanceladas = reservas.filter(r => r.estado !== 'cancelada')
+  const jugados = noCanceladas.filter(r => r.fecha < hoy).length
+  const totalGastado = noCanceladas.reduce((s, r) => s + Number(r.monto || r.canchas?.precio_hora || 0), 0)
+  const conteoCanchas = {}
+  noCanceladas.forEach(r => { const n = r.canchas?.nombre; if (n) conteoCanchas[n] = (conteoCanchas[n] || 0) + 1 })
+  const canchaFavorita = Object.entries(conteoCanchas).sort((a, b) => b[1] - a[1])[0]?.[0] || '—'
+
   return (
     <div className="page">
       <div className="container" style={{ maxWidth: 700 }}>
@@ -128,6 +136,26 @@ export default function MyBookingsPage() {
           <Calendar size={22} style={{ color: 'var(--green)' }} />
           <h1 style={{ fontSize: 20, fontWeight: 700 }}>Mis turnos</h1>
         </div>
+
+        {!loading && noCanceladas.length > 0 && (
+          <div className="grid-3" style={{ marginBottom: 20 }}>
+            <div className="stat-card">
+              <div className="stat-label">Turnos jugados</div>
+              <div className="stat-value">{jugados}</div>
+              <div className="stat-sub">{noCanceladas.length} en total</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">Cancha favorita</div>
+              <div className="stat-value" style={{ fontSize: 15, lineHeight: 1.3 }}>{canchaFavorita}</div>
+              <div className="stat-sub">la que más elegís</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">Total en turnos</div>
+              <div className="stat-value" style={{ color: 'var(--green)' }}>${totalGastado.toLocaleString('es-AR')}</div>
+              <div className="stat-sub">reservado</div>
+            </div>
+          </div>
+        )}
 
         <div className="tabs">
           <button className={`tab-btn ${tab === 'proximas' ? 'active' : ''}`} onClick={() => setTab('proximas')}>
@@ -139,7 +167,15 @@ export default function MyBookingsPage() {
         </div>
 
         {loading ? (
-          <div className="loading-center"><div className="spinner" /></div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="card" style={{ padding: 16 }}>
+                <div className="skeleton" style={{ height: 16, width: '55%', marginBottom: 10 }} />
+                <div className="skeleton" style={{ height: 12, width: '35%', marginBottom: 14 }} />
+                <div className="skeleton" style={{ height: 34, width: '100%' }} />
+              </div>
+            ))}
+          </div>
         ) : lista.length === 0 ? (
           <div className="empty-state">
             <Calendar size={48} />

@@ -84,7 +84,23 @@ export default function OwnerDashboardPage() {
   const proximas    = reservas.filter(r => r.fecha >= hoy && r.estado !== 'cancelada')
   const pendientes  = reservas.filter(r => r.estado === 'pendiente')
 
-  if (loading) return <div className="loading-center"><div className="spinner" /></div>
+  if (loading) return (
+    <div className="page"><div className="container">
+      <div className="grid-4" style={{ marginBottom: 24 }}>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="card" style={{ padding: 16 }}>
+            <div className="skeleton" style={{ height: 12, width: '60%', marginBottom: 10 }} />
+            <div className="skeleton" style={{ height: 24, width: '40%' }} />
+          </div>
+        ))}
+      </div>
+      {Array.from({ length: 3 }).map((_, i) => (
+        <div key={i} className="card" style={{ padding: 16, marginBottom: 12 }}>
+          <div className="skeleton" style={{ height: 48, width: '100%' }} />
+        </div>
+      ))}
+    </div></div>
+  )
 
   return (
     <div className="page">
