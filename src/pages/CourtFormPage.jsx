@@ -147,7 +147,7 @@ export default function CourtFormPage() {
       if (err) { setError(`Error al crear la cancha: ${err.message}`); setSaving(false); return }
       const slots = []
       for (let dia = 0; dia <= 6; dia++)
-        for (let h = 8; h <= 22; h++)
+        for (let h = 8; h <= 23; h++)
           slots.push({ cancha_id: data.id, dia_semana: dia, hora_inicio: `${String(h).padStart(2,'0')}:00:00`, hora_fin: `${String(h+1).padStart(2,'0')}:00:00`, activo: true })
       await supabase.from('horarios').insert(slots)
     }

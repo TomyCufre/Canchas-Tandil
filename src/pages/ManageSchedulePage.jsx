@@ -7,7 +7,7 @@ import { timeToHour, hourToTime } from '../lib/tipoCancha'
 import { fechaLocal } from '../lib/fecha'
 
 const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
-const HORAS = Array.from({ length: 15 }, (_, i) => i + 8) // 8 a 22
+const HORAS = Array.from({ length: 16 }, (_, i) => i + 8) // 8 a 23
 const hoyStr = () => fechaLocal()
 const fmtFecha = f => new Date(f + 'T00:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })
 

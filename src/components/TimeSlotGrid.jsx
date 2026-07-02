@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { timeToHour, hourToTime } from '../lib/tipoCancha'
 
-const HORAS = Array.from({ length: 15 }, (_, i) => i + 8) // 8 a 22 (slots de 1h, terminan a las 23)
+const HORAS = Array.from({ length: 16 }, (_, i) => i + 8) // 8 a 23 (slots de 1h, el último termina a las 24)
 
 export default function TimeSlotGrid({ canchaId, fecha, diaHorarios, onSelect, selectedHora }) {
   const [reservas, setReservas] = useState([])
