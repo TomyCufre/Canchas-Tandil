@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { TIPO_LABEL, timeToHour } from '../lib/tipoCancha'
-import { Plus, Edit2, Trash2, Eye, EyeOff, Clock, CalendarCheck, CheckCircle, XCircle, MessageCircle, ChevronLeft, ChevronRight, CalendarDays, Star, MessageSquare, BarChart3 } from 'lucide-react'
+import { Plus, Edit2, Trash2, Eye, EyeOff, Clock, CalendarCheck, CheckCircle, XCircle, MessageCircle, ChevronLeft, ChevronRight, CalendarDays, Star, MessageSquare, BarChart3, Download } from 'lucide-react'
 import StarRating from '../components/StarRating'
 import { useSEO } from '../hooks/useSEO'
 
@@ -535,6 +535,7 @@ function CalendarView({ reservas, canchas, onRefresh }) {
 }
 
 function Estadisticas({ reservas }) {
+  const [exportando, setExportando] = useState(false)
   const activas = reservas.filter(r => r.estado !== 'cancelada')
   const canceladas = reservas.filter(r => r.estado === 'cancelada')
   const montoDe = r => Number(r.monto || r.canchas?.precio_hora || 0)
@@ -573,12 +574,68 @@ function Estadisticas({ reservas }) {
   const totalIngresos = activas.reduce((s, r) => s + montoDe(r), 0)
   const ticket = activas.length ? Math.round(totalIngresos / activas.length) : 0
 
+  async function exportarExcel() {
+    setExportando(true)
+    try {
+      const ExcelJS = (await import('exceljs')).default
+      const wb = new ExcelJS.Workbook()
+      const boldHeader = ws => { ws.getRow(1).font = { bold: true } }
+
+      const s1 = wb.addWorksheet('Resumen')
+      s1.addRow(['Métrica', 'Valor'])
+      s1.addRow(['Reservados con éxito', activas.length])
+      s1.addRow(['Dados de baja', canceladas.length])
+      s1.addRow(['Ingresos totales', totalIngresos])
+      s1.addRow(['Ticket promedio', ticket])
+      s1.columns = [{ width: 22 }, { width: 16 }]
+      boldHeader(s1)
+
+      const s2 = wb.addWorksheet('Ingresos por mes')
+      s2.addRow(['Mes', 'Ingresos'])
+      meses.forEach(m => s2.addRow([m.label, ingresoMes[m.key]]))
+      s2.columns = [{ width: 12 }, { width: 16 }]
+      boldHeader(s2)
+
+      const s3 = wb.addWorksheet('Por cancha')
+      s3.addRow(['Cancha', 'Alquileres', 'Ingresos', ...meses.map(m => m.label)])
+      ranking.forEach(c => s3.addRow([c.nombre, c.count, c.ingresos, ...meses.map(m => c.porMes[m.key] || 0)]))
+      s3.columns = [{ width: 28 }, { width: 12 }, { width: 14 }, ...meses.map(() => ({ width: 8 }))]
+      boldHeader(s3)
+
+      const s4 = wb.addWorksheet('Reservas')
+      s4.addRow(['Fecha', 'Cancha', 'Hora', 'Estado', 'Método de pago', 'Monto', 'Código'])
+      reservas.forEach(r => s4.addRow([
+        r.fecha, r.canchas?.nombre, `${timeToHour(r.hora_inicio)}:00`, r.estado, r.metodo_pago, montoDe(r), r.codigo,
+      ]))
+      s4.columns = [{ width: 12 }, { width: 26 }, { width: 8 }, { width: 12 }, { width: 16 }, { width: 12 }, { width: 12 }]
+      boldHeader(s4)
+
+      const buf = await wb.xlsx.writeBuffer()
+      const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `estadisticas-canchas-tandil-${new Date().toISOString().split('T')[0]}.xlsx`
+      a.click()
+      URL.revokeObjectURL(url)
+    } finally {
+      setExportando(false)
+    }
+  }
+
   if (!reservas.length) {
     return <div className="empty-state"><BarChart3 size={48} /><p>Sin datos todavía</p><span>Las estadísticas aparecen cuando tengas reservas</span></div>
   }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <button onClick={exportarExcel} className="btn btn-secondary btn-sm" disabled={exportando}>
+          {exportando ? <span className="spinner" style={{ width: 14, height: 14, borderWidth: 2 }} /> : <Download size={14} />}
+          {exportando ? 'Generando...' : 'Descargar Excel'}
+        </button>
+      </div>
+
       <div className="grid-4">
         <div className="stat-card">
           <div className="stat-label">Reservados con éxito</div>
