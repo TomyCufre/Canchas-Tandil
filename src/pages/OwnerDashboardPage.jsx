@@ -620,11 +620,14 @@ function Estadisticas({ reservas }) {
       boldHeader(s3)
 
       const s4 = wb.addWorksheet('Reservas')
-      s4.addRow(['Fecha', 'Cancha', 'Hora', 'Estado', 'Método de pago', 'Monto', 'Código'])
-      reservas.forEach(r => s4.addRow([
-        r.fecha, r.canchas?.nombre, `${timeToHour(r.hora_inicio)}:00`, r.estado, r.metodo_pago, montoDe(r), r.codigo,
-      ]))
-      s4.columns = [{ width: 12 }, { width: 26 }, { width: 8 }, { width: 12 }, { width: 16 }, { width: 12 }, { width: 12 }]
+      s4.addRow(['Fecha', 'Mes', 'Cancha', 'Horario', 'Estado', 'Método de pago', 'Valor', 'Código'])
+      reservas.forEach(r => {
+        const [y, m] = r.fecha.split('-')
+        const mes = `${MESES_CAL[Number(m) - 1]} ${y}`
+        const horario = `${timeToHour(r.hora_inicio)}:00 – ${timeToHour(r.hora_fin)}:00 hs`
+        s4.addRow([r.fecha, mes, r.canchas?.nombre, horario, r.estado, r.metodo_pago, montoDe(r), r.codigo])
+      })
+      s4.columns = [{ width: 12 }, { width: 16 }, { width: 26 }, { width: 16 }, { width: 12 }, { width: 16 }, { width: 12 }, { width: 12 }]
       boldHeader(s4)
 
       const buf = await wb.xlsx.writeBuffer()
