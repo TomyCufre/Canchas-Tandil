@@ -77,6 +77,8 @@ export default function CourtCard({ cancha, rating, esFavorito, onToggleFavorito
               {cancha.tiene_iluminacion && <span title="Iluminación" style={{ display: 'inline-flex' }}><Lightbulb size={14} /></span>}
               {cancha.tiene_vestuario && <span title="Vestuario" style={{ display: 'inline-flex' }}><ShirtIcon size={14} /></span>}
               {cancha.tiene_estacionamiento && <span title="Estacionamiento" style={{ display: 'inline-flex' }}><Car size={14} /></span>}
+              {(cancha.tiene_una_pelota || cancha.tiene_dos_pelotas) && <span title={cancha.tiene_dos_pelotas ? '2 pelotas' : '1 pelota'}>⚽</span>}
+              {cancha.tiene_pecheras && <span title="Pecheras">🎽</span>}
             </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontWeight: 700, color: 'var(--green)', fontSize: 15 }}>

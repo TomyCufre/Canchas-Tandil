@@ -30,6 +30,7 @@ export default function CourtFormPage() {
   const [form, setForm] = useState({
     nombre: '', direccion: '', tipo: 'futbol5', precio_hora: '', precio_por_persona: '', descripcion: '',
     tiene_vestuario: false, tiene_estacionamiento: false, tiene_iluminacion: true,
+    tiene_una_pelota: false, tiene_dos_pelotas: false, tiene_pecheras: false,
     acepta_presencial: true, acepta_online: false,
     fotos: [], latitud: null, longitud: null, maps_url: '',
   })
@@ -52,6 +53,9 @@ export default function CourtFormPage() {
       tiene_vestuario: data.tiene_vestuario || false,
       tiene_estacionamiento: data.tiene_estacionamiento || false,
       tiene_iluminacion: data.tiene_iluminacion !== false,
+      tiene_una_pelota: data.tiene_una_pelota || false,
+      tiene_dos_pelotas: data.tiene_dos_pelotas || false,
+      tiene_pecheras: data.tiene_pecheras || false,
       acepta_presencial: data.acepta_presencial !== false,
       acepta_online: data.acepta_online || false,
       fotos: data.fotos || [],
@@ -133,7 +137,9 @@ export default function CourtFormPage() {
       precio_por_persona: form.precio_por_persona ? Number(form.precio_por_persona) : null,
       descripcion: form.descripcion.trim(),
       tiene_vestuario: form.tiene_vestuario, tiene_estacionamiento: form.tiene_estacionamiento,
-      tiene_iluminacion: form.tiene_iluminacion, acepta_presencial: form.acepta_presencial,
+      tiene_iluminacion: form.tiene_iluminacion,
+      tiene_una_pelota: form.tiene_una_pelota, tiene_dos_pelotas: form.tiene_dos_pelotas, tiene_pecheras: form.tiene_pecheras,
+      acepta_presencial: form.acepta_presencial,
       acepta_online: form.acepta_online, fotos: form.fotos,
       latitud: form.latitud, longitud: form.longitud,
       maps_url: form.maps_url.trim() || null,
@@ -267,6 +273,9 @@ export default function CourtFormPage() {
                 { key: 'tiene_vestuario', label: '🚿 Vestuario' },
                 { key: 'tiene_estacionamiento', label: '🅿️ Estacionamiento' },
                 { key: 'tiene_iluminacion', label: '💡 Iluminación' },
+                { key: 'tiene_una_pelota', label: '⚽ 1 pelota' },
+                { key: 'tiene_dos_pelotas', label: '⚽ 2 pelotas' },
+                { key: 'tiene_pecheras', label: '🎽 Pecheras' },
               ].map(({ key, label }) => (
                 <ToggleChip key={key} active={form[key]} onClick={() => toggleBool(key)} label={label} />
               ))}

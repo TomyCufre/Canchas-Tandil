@@ -185,6 +185,9 @@ export default function CourtDetailPage() {
                   {cancha.tiene_vestuario      && <div style={chip}><ShirtIcon size={13} /> Vestuario</div>}
                   {cancha.tiene_estacionamiento && <div style={chip}><Car size={13} /> Estacionamiento</div>}
                   {cancha.tiene_iluminacion     && <div style={chip}><Lightbulb size={13} /> Iluminación</div>}
+                  {cancha.tiene_una_pelota      && <div style={chip}>⚽ 1 pelota</div>}
+                  {cancha.tiene_dos_pelotas     && <div style={chip}>⚽ 2 pelotas</div>}
+                  {cancha.tiene_pecheras        && <div style={chip}>🎽 Pecheras</div>}
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {cancha.acepta_presencial && <div style={{ ...chip, background: '#eff6ff', color: '#1d4ed8' }}><CreditCard size={13} /> Pago en el lugar</div>}
