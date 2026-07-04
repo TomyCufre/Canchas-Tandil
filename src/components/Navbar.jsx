@@ -46,14 +46,7 @@ export default function Navbar() {
     }}>
       <div className="container" style={{ display: 'flex', alignItems: 'center', height: 56, gap: 8 }}>
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', marginRight: 'auto' }}>
-          <div style={{
-            width: 32, height: 32,
-            background: 'var(--green)',
-            borderRadius: 8,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <span style={{ fontSize: 18 }}>⚽</span>
-          </div>
+          <img src="/icon-512.png" alt="Canchas Tandil" style={{ width: 34, height: 34, borderRadius: 8, objectFit: 'cover' }} />
           <span style={{ fontWeight: 700, fontSize: 16, color: 'var(--text)' }}>
             Canchas <span style={{ color: 'var(--green)' }}>Tandil</span>
           </span>
