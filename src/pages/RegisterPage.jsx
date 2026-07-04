@@ -79,7 +79,7 @@ export default function RegisterPage() {
     <div className="page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 56px)', padding: '24px 16px' }}>
       <div style={{ width: '100%', maxWidth: 420 }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{ fontSize: 40, marginBottom: 8 }}>⚽</div>
+          <img src="/logo.png" alt="Canchas Tandil" style={{ width: '100%', maxWidth: 240, height: 'auto', margin: '0 auto 4px' }} />
           <h1 style={{ fontSize: 22, fontWeight: 700 }}>Crear cuenta</h1>
           <p style={{ color: 'var(--muted)', fontSize: 14, marginTop: 4 }}>Unite a Canchas Tandil</p>
         </div>
