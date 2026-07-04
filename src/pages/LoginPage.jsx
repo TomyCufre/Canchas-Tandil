@@ -61,7 +61,7 @@ export default function LoginPage() {
     <div className="page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 56px)' }}>
       <div style={{ width: '100%', maxWidth: 380, padding: '0 16px' }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <img src="/logo.png" alt="Canchas Tandil" style={{ width: '100%', maxWidth: 240, height: 'auto', margin: '0 auto 4px' }} />
+          <img src="/icon-512.png" alt="Canchas Tandil" style={{ width: 180, height: 180, objectFit: 'contain', margin: '0 auto 8px', display: 'block' }} />
           <h1 style={{ fontSize: 22, fontWeight: 700 }}>{modo === 'login' ? 'Bienvenido de nuevo' : 'Recuperar contraseña'}</h1>
           <p style={{ color: 'var(--muted)', fontSize: 14, marginTop: 4 }}>
             {modo === 'login' ? 'Ingresá a tu cuenta de Canchas Tandil' : 'Te enviamos un link para crear una nueva'}
