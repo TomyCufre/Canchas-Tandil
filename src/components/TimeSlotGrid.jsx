@@ -58,9 +58,16 @@ export default function TimeSlotGrid({ canchaId, fecha, diaHorarios, onSelect, s
         const seleccionado = selectedHora === hora
         const pasado = esHoy && hora <= ahora.getHours()
 
-        if (!disponible || pasado) {
+        if (pasado) {
           return (
-            <div key={hora} style={slotStyle('disabled')} title={pasado ? 'Horario pasado' : 'No disponible'}>
+            <div key={hora} style={slotStyle('pasado')} title="Ya pasó">
+              <span>{hora}:00</span>
+            </div>
+          )
+        }
+        if (!disponible) {
+          return (
+            <div key={hora} style={slotStyle('disabled')} title="No disponible">
               <span>{hora}:00</span>
             </div>
           )
@@ -90,6 +97,7 @@ function slotStyle(estado) {
   switch (estado) {
     case 'libre':    return { ...base, background: 'var(--green-50)', borderColor: '#86efac', color: 'var(--green-dark)' }
     case 'ocupado':  return { ...base, background: '#f1f5f9', borderColor: 'var(--border)', color: 'var(--muted)', cursor: 'not-allowed', textDecoration: 'line-through' }
+    case 'pasado':   return { ...base, background: 'transparent', borderColor: '#f1f5f9', color: '#cbd5e1', cursor: 'not-allowed' }
     case 'selected': return { ...base, background: 'var(--green)', borderColor: 'var(--green-dark)', color: 'white' }
     case 'disabled': return { ...base, background: '#fafafa', borderColor: 'var(--border)', color: '#d1d5db', cursor: 'not-allowed', borderStyle: 'dashed' }
     default: return base

@@ -268,6 +268,9 @@ export default function CourtDetailPage() {
               <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <span style={{ width: 10, height: 10, borderRadius: 3, background: '#f1f5f9', border: '1px solid var(--border)', display: 'inline-block' }} /> Ocupado
               </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ width: 10, height: 10, borderRadius: 3, background: 'transparent', border: '1px solid #f1f5f9', display: 'inline-block' }} /> Pasó
+              </span>
             </div>
 
             <TimeSlotGrid

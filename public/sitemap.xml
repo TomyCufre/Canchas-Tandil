@@ -8,11 +8,41 @@
   <url>
     <loc>https://canchas-tandil.vercel.app/register</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.4</priority>
   </url>
   <url>
     <loc>https://canchas-tandil.vercel.app/login</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://canchas-tandil.vercel.app/canchas/5a9993ac-db70-40dd-bdc4-7c313eecfb15</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://canchas-tandil.vercel.app/canchas/80686233-8798-4255-8b9d-0b21de357afc</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://canchas-tandil.vercel.app/canchas/50502c36-e1be-4168-abae-31e97ec871eb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://canchas-tandil.vercel.app/canchas/6bbf5418-bf4d-4377-b9ec-34fb860ac4ad</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://canchas-tandil.vercel.app/canchas/6084b408-efc9-4685-a951-876b26abc513</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://canchas-tandil.vercel.app/canchas/07283311-7983-4d17-9ca8-79f4ced5cc75</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>
