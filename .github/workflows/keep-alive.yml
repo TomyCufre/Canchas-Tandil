@@ -1,0 +1,36 @@
+name: Mantener viva + chequeo de salud
+
+# Los proyectos gratuitos de Supabase se pausan tras ~1 semana sin actividad.
+# Este workflow consulta la base cada 3 días (resetea el contador) y verifica
+# que la app responda. Si algo falla, GitHub te manda un mail automáticamente.
+
+on:
+  schedule:
+    - cron: '0 12 */3 * *'   # cada 3 días, 12:00 UTC (9:00 en Argentina)
+  workflow_dispatch:          # permite correrlo a mano desde la pestaña Actions
+
+jobs:
+  chequeo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Consultar Supabase (evita el auto-pausado)
+        run: |
+          code=$(curl -s -o /tmp/resp.txt -w "%{http_code}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/canchas?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+          echo "Supabase respondió HTTP $code"
+          if [ "$code" != "200" ]; then
+            echo "::error::Supabase no respondió OK (HTTP $code)"
+            cat /tmp/resp.txt
+            exit 1
+          fi
+
+      - name: Verificar que la app está online
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" -L https://canchas-tandil.vercel.app/)
+          echo "La app respondió HTTP $code"
+          if [ "$code" != "200" ]; then
+            echo "::error::La app no responde (HTTP $code)"
+            exit 1
+          fi

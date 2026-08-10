@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { timeToHour } from '../lib/tipoCancha'
-import { Calendar, X, Share2, Star, MessageCircle, CalendarPlus } from 'lucide-react'
+import { Calendar, X, Share2, Star, MessageCircle, CalendarPlus, Users } from 'lucide-react'
 import StarRating from '../components/StarRating'
+import DividirTurnoModal from '../components/DividirTurnoModal'
 import { useSEO } from '../hooks/useSEO'
 import { fechaLocal } from '../lib/fecha'
 
@@ -27,6 +28,7 @@ export default function MyBookingsPage() {
   const [tab, setTab] = useState('proximas')
   const [confirmCancel, setConfirmCancel] = useState(null)
   const [cancelando, setCancelando] = useState(null)
+  const [modalDividir, setModalDividir] = useState(null) // reserva object
   const [modalResena, setModalResena] = useState(null) // reserva object
   const [resenaForm, setResenaForm] = useState({ puntuacion: 0, comentario: '' })
   const [guardandoResena, setGuardandoResena] = useState(false)
@@ -224,6 +226,12 @@ export default function MyBookingsPage() {
                       <div style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', background: 'var(--bg)', padding: '4px 10px', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
                         # {r.codigo}
                       </div>
+                      {/* Dividir el gasto entre los jugadores (turnos por jugarse) */}
+                      {!yaPaso && r.estado !== 'cancelada' && (
+                        <button onClick={() => setModalDividir(r)} className="btn btn-ghost btn-sm" style={{ color: 'var(--green)' }}>
+                          <Users size={14} /> Dividir
+                        </button>
+                      )}
                       {/* Reseña si ya pasó */}
                       {yaPaso && r.estado !== 'cancelada' && (
                         <button onClick={() => abrirResena(r)} className="btn btn-ghost btn-sm" style={{ color: tieneResena ? '#f59e0b' : 'var(--muted)' }}>
@@ -274,6 +282,11 @@ export default function MyBookingsPage() {
           </div>
         )}
       </div>
+
+      {/* Dividir el turno entre los jugadores */}
+      {modalDividir && (
+        <DividirTurnoModal reserva={modalDividir} onClose={() => setModalDividir(null)} />
+      )}
 
       {/* Modal de reseña */}
       {modalResena && (
