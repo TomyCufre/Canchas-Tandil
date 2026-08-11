@@ -32,8 +32,9 @@ export default function App() {
           <Route path="/perfil" element={<ProfilePage />} />
           <Route path="/admin" element={<AdminPage />} />
 
+          {/* Cualquiera logueado ve SUS turnos (un dueño también juega) */}
           <Route path="/mis-turnos" element={
-            <ProtectedRoute rol="jugador">
+            <ProtectedRoute>
               <MyBookingsPage />
             </ProtectedRoute>
           } />

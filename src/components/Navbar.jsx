@@ -57,12 +57,10 @@ export default function Navbar() {
             <Link to="/" className="btn btn-ghost btn-sm hide-mobile">
               <Home size={15} /> Canchas
             </Link>
-            {profile.rol === 'jugador' && (
-              <Link to="/mis-turnos" className="btn btn-ghost btn-sm">
-                <Calendar size={15} />
-                <span className="hide-mobile">Mis turnos</span>
-              </Link>
-            )}
+            <Link to="/mis-turnos" className="btn btn-ghost btn-sm">
+              <Calendar size={15} />
+              <span className="hide-mobile">Mis turnos</span>
+            </Link>
             {profile.rol === 'dueno' && (
               <>
                 <Link to="/panel" className="btn btn-ghost btn-sm" title="Reservas pendientes" style={{ position: 'relative' }}>
