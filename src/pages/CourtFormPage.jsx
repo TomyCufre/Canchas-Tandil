@@ -32,6 +32,7 @@ export default function CourtFormPage() {
     tiene_vestuario: false, tiene_estacionamiento: false, tiene_iluminacion: true,
     tiene_una_pelota: false, tiene_dos_pelotas: false, tiene_pecheras: false,
     acepta_presencial: true, acepta_online: false,
+    requiere_sena: false, sena_monto: '', datos_pago: '',
     fotos: [], latitud: null, longitud: null, maps_url: '',
   })
 
@@ -58,6 +59,9 @@ export default function CourtFormPage() {
       tiene_pecheras: data.tiene_pecheras || false,
       acepta_presencial: data.acepta_presencial !== false,
       acepta_online: data.acepta_online || false,
+      requiere_sena: data.requiere_sena || false,
+      sena_monto: data.sena_monto || '',
+      datos_pago: data.datos_pago || '',
       fotos: data.fotos || [],
       latitud: data.latitud, longitud: data.longitud, maps_url: data.maps_url || '',
     })
@@ -129,6 +133,8 @@ export default function CourtFormPage() {
     if (!form.direccion.trim()) { setError('La dirección es obligatoria'); return }
     if (!form.precio_hora || Number(form.precio_hora) <= 0) { setError('El precio debe ser mayor a 0'); return }
     if (!form.acepta_presencial && !form.acepta_online) { setError('Seleccioná al menos un método de pago'); return }
+    if (form.requiere_sena && (!form.sena_monto || Number(form.sena_monto) <= 0)) { setError('Indicá el monto de la seña'); return }
+    if (form.requiere_sena && Number(form.sena_monto) > Number(form.precio_hora)) { setError('La seña no puede superar el precio del turno'); return }
 
     setSaving(true)
     const payload = {
@@ -141,6 +147,9 @@ export default function CourtFormPage() {
       tiene_una_pelota: form.tiene_una_pelota, tiene_dos_pelotas: form.tiene_dos_pelotas, tiene_pecheras: form.tiene_pecheras,
       acepta_presencial: form.acepta_presencial,
       acepta_online: form.acepta_online, fotos: form.fotos,
+      requiere_sena: form.requiere_sena,
+      sena_monto: form.requiere_sena && form.sena_monto ? Number(form.sena_monto) : null,
+      datos_pago: form.requiere_sena ? (form.datos_pago.trim() || null) : null,
       latitud: form.latitud, longitud: form.longitud,
       maps_url: form.maps_url.trim() || null,
     }
@@ -288,6 +297,36 @@ export default function CourtFormPage() {
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               <ToggleChip active={form.acepta_presencial} onClick={() => toggleBool('acepta_presencial')} label="💵 Pago en el lugar" />
               <ToggleChip active={form.acepta_online} onClick={() => toggleBool('acepta_online')} label="💳 Mercado Pago" />
+            </div>
+
+            {/* Seña opcional */}
+            <div style={{ marginTop: 20, paddingTop: 18, borderTop: '1px solid var(--border)' }}>
+              <ToggleChip active={form.requiere_sena} onClick={() => toggleBool('requiere_sena')} label="🔒 Pedir seña para asegurar el turno" />
+              <p className="form-hint" style={{ marginTop: 8 }}>
+                Si lo activás, el jugador ve que tiene que enviarte una seña. Vos marcás en el panel cuándo la recibiste.
+              </p>
+
+              {form.requiere_sena && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 14 }}>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label">Monto de la seña (ARS) *</label>
+                    <input type="number" min="1" className="form-input" placeholder="Ej: 20000"
+                      value={form.sena_monto} onChange={e => setField('sena_monto', e.target.value)} />
+                    {form.sena_monto > 0 && form.precio_hora > 0 && (
+                      <p className="form-hint">
+                        El jugador abona ${Number(form.sena_monto).toLocaleString('es-AR')} por adelantado y
+                        ${Math.max(0, Number(form.precio_hora) - Number(form.sena_monto)).toLocaleString('es-AR')} en la cancha.
+                      </p>
+                    )}
+                  </div>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="form-label">¿Dónde te la envían?</label>
+                    <input className="form-input" placeholder="Ej: alias.mercadopago o CBU"
+                      value={form.datos_pago} onChange={e => setField('datos_pago', e.target.value)} />
+                    <p className="form-hint">Se le muestra al jugador recién después de reservar.</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

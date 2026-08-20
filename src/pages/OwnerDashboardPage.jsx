@@ -42,7 +42,7 @@ export default function OwnerDashboardPage() {
     const [{ data: cs }, { data: rs }, { data: res }] = await Promise.all([
       supabase.from('canchas').select('*').eq('dueno_id', user.id).order('created_at', { ascending: false }),
       supabase.from('reservas')
-        .select('*, canchas!inner(nombre, dueno_id, precio_hora)')
+        .select('*, canchas!inner(nombre, dueno_id, precio_hora, requiere_sena, sena_monto)')
         .eq('canchas.dueno_id', user.id)
         .order('fecha', { ascending: false })
         .order('hora_inicio', { ascending: false })
@@ -264,6 +264,13 @@ function ReservasList({ reservas, onRefresh }) {
     setDetalleId(jugadorId)
   }
 
+  async function marcarSena(reserva) {
+    setAccionando(reserva.id)
+    await supabase.from('reservas').update({ sena_pagada: !reserva.sena_pagada }).eq('id', reserva.id)
+    setAccionando(null)
+    onRefresh()
+  }
+
   async function cambiarEstado(reserva, nuevoEstado) {
     setAccionando(reserva.id)
     await supabase.from('reservas').update({ estado: nuevoEstado }).eq('id', reserva.id)
@@ -305,7 +312,16 @@ function ReservasList({ reservas, onRefresh }) {
                   <td style={{ fontWeight: 500 }}>{r.canchas?.nombre}</td>
                   <td>{r.fecha}</td>
                   <td>{timeToHour(r.hora_inicio)}:00 hs</td>
-                  <td><span className={`badge ${ESTADO_BADGE[r.estado]}`}>{r.estado}</span></td>
+                  <td>
+                    <span className={`badge ${ESTADO_BADGE[r.estado]}`}>{r.estado}</span>
+                    {r.canchas?.requiere_sena && r.canchas?.sena_monto > 0 && r.estado !== 'cancelada' && (
+                      <div style={{ fontSize: 11, marginTop: 4, fontWeight: 600, color: r.sena_pagada ? 'var(--green)' : '#92400e' }}>
+                        {r.sena_pagada
+                          ? '🔒 Seña cobrada'
+                          : `🔒 Seña $${Number(r.canchas.sena_monto).toLocaleString('es-AR')} pendiente`}
+                      </div>
+                    )}
+                  </td>
                   <td><span style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: 12 }}>{r.codigo}</span></td>
                   <td>
                     <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -327,6 +343,11 @@ function ReservasList({ reservas, onRefresh }) {
                             <XCircle size={13} /> Rechazar
                           </button>
                         </>
+                      )}
+                      {r.canchas?.requiere_sena && r.canchas?.sena_monto > 0 && r.estado !== 'cancelada' && (
+                        <button onClick={() => marcarSena(r)} className="btn btn-secondary btn-sm" disabled={accionando === r.id}>
+                          {r.sena_pagada ? 'Desmarcar seña' : '🔒 Seña recibida'}
+                        </button>
                       )}
                       <button onClick={() => verContacto(r.jugador_id)} className="btn btn-ghost btn-sm">
                         Contacto

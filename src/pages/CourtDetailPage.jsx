@@ -192,6 +192,11 @@ export default function CourtDetailPage() {
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {cancha.acepta_presencial && <div style={{ ...chip, background: '#eff6ff', color: '#1d4ed8' }}><CreditCard size={13} /> Pago en el lugar</div>}
                   {cancha.acepta_online     && <div style={{ ...chip, background: '#eff6ff', color: '#1d4ed8' }}><CreditCard size={13} /> Mercado Pago</div>}
+                  {cancha.requiere_sena && cancha.sena_monto > 0 && (
+                    <div style={{ ...chip, background: '#fffbeb', color: '#92400e' }}>
+                      🔒 Seña ${Number(cancha.sena_monto).toLocaleString('es-AR')}
+                    </div>
+                  )}
                 </div>
 
                 <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
@@ -355,6 +360,14 @@ export default function CourtDetailPage() {
                   </div>
                 ))}
 
+                {cancha.requiere_sena && cancha.sena_monto > 0 && (
+                  <div className="alert" style={{ background: '#fffbeb', border: '1px solid #fcd34d', color: '#92400e', fontSize: 13, lineHeight: 1.5 }}>
+                    🔒 <b>Esta cancha pide seña de ${Number(cancha.sena_monto).toLocaleString('es-AR')}</b> para asegurar el turno.
+                    El resto (${Math.max(0, Number(cancha.precio_hora) - Number(cancha.sena_monto)).toLocaleString('es-AR')}) lo abonás en la cancha.
+                    Después de reservar te mostramos cómo enviarla.
+                  </div>
+                )}
+
                 <div className="divider" />
                 <div className="form-group">
                   <label className="form-label">¿Es un turno fijo?</label>
@@ -438,6 +451,30 @@ export default function CourtDetailPage() {
                   </button>
                 </div>
               </div>
+
+              {cancha.requiere_sena && cancha.sena_monto > 0 && (
+                <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 'var(--radius-lg)', padding: 16, marginBottom: 20, textAlign: 'left' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#92400e', marginBottom: 6 }}>
+                    🔒 Enviá la seña para confirmar tu turno
+                  </div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: '#92400e', marginBottom: 6 }}>
+                    ${Number(cancha.sena_monto).toLocaleString('es-AR')}
+                  </div>
+                  {cancha.datos_pago && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                      <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, background: '#fff', padding: '4px 10px', borderRadius: 'var(--radius)', border: '1px solid #fcd34d' }}>
+                        {cancha.datos_pago}
+                      </span>
+                      <button onClick={() => navigator.clipboard?.writeText(cancha.datos_pago)} className="btn btn-ghost btn-sm" title="Copiar" aria-label="Copiar datos de pago">
+                        <Copy size={13} />
+                      </button>
+                    </div>
+                  )}
+                  <div style={{ fontSize: 12, color: '#92400e' }}>
+                    Avisale al dueño cuando la envíes. El resto lo abonás en la cancha.
+                  </div>
+                </div>
+              )}
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24, fontSize: 14 }}>
                 {[

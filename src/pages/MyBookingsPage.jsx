@@ -39,7 +39,7 @@ export default function MyBookingsPage() {
   async function fetchReservas() {
     const { data: rs } = await supabase
       .from('reservas')
-      .select('*, canchas(nombre, direccion, tipo, precio_hora)')
+      .select('*, canchas(nombre, direccion, tipo, precio_hora, requiere_sena, sena_monto, datos_pago)')
       .eq('jugador_id', user.id)
       .order('fecha', { ascending: false })
       .order('hora_inicio', { ascending: false })
@@ -220,6 +220,26 @@ export default function MyBookingsPage() {
                       <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--green)' }}>${Number(r.monto || r.canchas?.precio_hora || 0).toLocaleString('es-AR')}</div>
                     </div>
                   </div>
+
+                  {/* Seña pendiente de enviar */}
+                  {!yaPaso && r.estado !== 'cancelada' && r.canchas?.requiere_sena && r.canchas?.sena_monto > 0 && (
+                    <div style={{
+                      background: r.sena_pagada ? 'var(--green-50)' : '#fffbeb',
+                      border: `1px solid ${r.sena_pagada ? '#86efac' : '#fcd34d'}`,
+                      borderRadius: 'var(--radius)', padding: '8px 12px', marginBottom: 12,
+                      fontSize: 12, color: r.sena_pagada ? 'var(--green-dark)' : '#92400e', lineHeight: 1.5,
+                    }}>
+                      {r.sena_pagada ? (
+                        <>✅ <b>Seña recibida</b> — el dueño confirmó tu pago de ${Number(r.canchas.sena_monto).toLocaleString('es-AR')}.</>
+                      ) : (
+                        <>
+                          🔒 <b>Seña pendiente: ${Number(r.canchas.sena_monto).toLocaleString('es-AR')}</b>
+                          {r.canchas.datos_pago && <> — enviala a <b style={{ fontFamily: 'monospace' }}>{r.canchas.datos_pago}</b></>}
+                          {' '}y avisale al dueño.
+                        </>
+                      )}
+                    </div>
+                  )}
 
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
