@@ -40,11 +40,6 @@ export default function TerminosPage() {
       <Seccion n="3" titulo="Registro y cuenta">
         <ul>
           <li>Para reservar es necesario crear una cuenta con datos <b>veraces, exactos y actualizados</b>, incluyendo un número de celular válido.</li>
-          <li>
-            El usuario debe tener <b>15 años cumplidos</b> como mínimo. Quienes tengan entre 15 y 18 años
-            necesitan la autorización de su madre, padre o tutor, quien será responsable de las reservas
-            realizadas y del cumplimiento de estos términos.
-          </li>
           <li>La contraseña es personal e intransferible. El usuario es responsable de toda actividad realizada desde su cuenta.</li>
           <li>Está prohibido crear cuentas con datos de terceros o hacerse pasar por otra persona.</li>
           <li>Las cuentas de Establecimiento requieren <b>aprobación previa</b> de la Plataforma antes de poder publicar canchas.</li>
