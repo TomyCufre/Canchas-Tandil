@@ -3,6 +3,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { AuthProvider } from './contexts/AuthContext'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
+import Footer from './components/Footer'
 
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
@@ -16,6 +17,8 @@ import ProfilePage from './pages/ProfilePage'
 import ShareReservaPage from './pages/ShareReservaPage'
 import AdminPage from './pages/AdminPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
+import TerminosPage from './pages/TerminosPage'
+import PrivacidadPage from './pages/PrivacidadPage'
 
 export default function App() {
   return (
@@ -27,6 +30,8 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/terminos" element={<TerminosPage />} />
+          <Route path="/privacidad" element={<PrivacidadPage />} />
           <Route path="/canchas/:id" element={<CourtDetailPage />} />
           <Route path="/reserva/:codigo" element={<ShareReservaPage />} />
           <Route path="/perfil" element={<ProfilePage />} />
@@ -71,6 +76,7 @@ export default function App() {
             </div>
           } />
         </Routes>
+        <Footer />
         <Analytics />
       </AuthProvider>
     </BrowserRouter>

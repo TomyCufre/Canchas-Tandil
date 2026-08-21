@@ -33,6 +33,8 @@ const paginas = [
   { loc: `${BASE}/`, changefreq: 'daily', priority: '1.0' },
   { loc: `${BASE}/register`, changefreq: 'monthly', priority: '0.4' },
   { loc: `${BASE}/login`, changefreq: 'monthly', priority: '0.3' },
+  { loc: `${BASE}/terminos`, changefreq: 'yearly', priority: '0.2' },
+  { loc: `${BASE}/privacidad`, changefreq: 'yearly', priority: '0.2' },
   ...canchas.map(c => ({ loc: `${BASE}/canchas/${c.id}`, changefreq: 'weekly', priority: '0.7' })),
 ]
 
