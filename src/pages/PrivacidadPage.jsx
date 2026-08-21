@@ -83,9 +83,10 @@ export default function PrivacidadPage() {
 
       <Seccion n="6" titulo="Cuánto tiempo los conservamos">
         <p>
-          Conservamos tus datos mientras tu cuenta permanezca activa. Si solicitás la baja, los eliminamos,
-          salvo aquella información que debamos conservar por obligaciones legales o para resolver reclamos
-          pendientes. <PorDefinir>¿plazo de conservación tras la baja?</PorDefinir>
+          Conservamos tus datos mientras tu cuenta permanezca activa. Si solicitás la baja, los conservamos
+          por <b>un (1) año</b> a partir de ese momento, plazo previsto para atender eventuales reclamos
+          relacionados con reservas o pagos. Cumplido ese plazo, los datos personales se eliminan. Podemos
+          mantener por más tiempo información estadística <b>anonimizada</b>, que no permite identificarte.
         </p>
       </Seccion>
 
@@ -122,8 +123,11 @@ export default function PrivacidadPage() {
 
       <Seccion n="10" titulo="Menores de edad">
         <p>
-          La Plataforma está dirigida a personas mayores de <PorDefinir>edad mínima</PorDefinir> años. No
-          recopilamos intencionalmente datos de menores sin autorización de sus padres o tutores.
+          La Plataforma admite usuarios a partir de los <b>15 años</b>. Quienes tengan entre 15 y 18 años
+          deben contar con la autorización de su madre, padre o tutor para registrarse, quien podrá ejercer
+          en su nombre los derechos sobre los datos y solicitar la baja de la cuenta escribiéndonos a{' '}
+          <PorDefinir>email de contacto</PorDefinir>. No recopilamos datos de menores de 15 años; si
+          detectamos una cuenta de ese tipo, la damos de baja.
         </p>
       </Seccion>
 

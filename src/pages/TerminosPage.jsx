@@ -40,7 +40,11 @@ export default function TerminosPage() {
       <Seccion n="3" titulo="Registro y cuenta">
         <ul>
           <li>Para reservar es necesario crear una cuenta con datos <b>veraces, exactos y actualizados</b>, incluyendo un número de celular válido.</li>
-          <li>El usuario debe ser mayor de <PorDefinir>edad mínima</PorDefinir> años. Los menores solo pueden utilizar la Plataforma con autorización de sus padres o tutores.</li>
+          <li>
+            El usuario debe tener <b>15 años cumplidos</b> como mínimo. Quienes tengan entre 15 y 18 años
+            necesitan la autorización de su madre, padre o tutor, quien será responsable de las reservas
+            realizadas y del cumplimiento de estos términos.
+          </li>
           <li>La contraseña es personal e intransferible. El usuario es responsable de toda actividad realizada desde su cuenta.</li>
           <li>Está prohibido crear cuentas con datos de terceros o hacerse pasar por otra persona.</li>
           <li>Las cuentas de Establecimiento requieren <b>aprobación previa</b> de la Plataforma antes de poder publicar canchas.</li>
@@ -71,7 +75,11 @@ export default function TerminosPage() {
       <Seccion n="6" titulo="Cancelaciones">
         <ul>
           <li>El jugador puede cancelar un turno pendiente desde la sección <i>Mis turnos</i>.</li>
-          <li>Las condiciones de devolución de señas o cargos por cancelación tardía son definidas por cada Establecimiento. <PorDefinir>¿fijamos una política mínima común?</PorDefinir></li>
+          <li>
+            Las condiciones de devolución de la seña y los plazos de aviso los define <b>cada Establecimiento</b>.
+            La Plataforma no fija una política común ni interviene en esas decisiones: consultá las condiciones
+            del club antes de reservar.
+          </li>
           <li>El Establecimiento puede cancelar un turno por causas justificadas (clima, mantenimiento, fuerza mayor), procurando avisar con la mayor antelación posible.</li>
         </ul>
       </Seccion>
@@ -145,8 +153,8 @@ export default function TerminosPage() {
       <Seccion n="14" titulo="Ley aplicable y jurisdicción">
         <p>
           Estos términos se rigen por las leyes de la República Argentina. Ante cualquier controversia, las
-          partes se someten a los tribunales ordinarios de <PorDefinir>jurisdicción: ¿Tandil?</PorDefinir>,
-          sin perjuicio de los derechos que la normativa de defensa del consumidor reconozca al usuario.
+          partes se someten a los tribunales ordinarios de la ciudad de <b>Tandil</b>, provincia de Buenos
+          Aires, sin perjuicio de los derechos que la normativa de defensa del consumidor reconozca al usuario.
         </p>
       </Seccion>
 
