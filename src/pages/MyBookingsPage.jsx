@@ -137,7 +137,7 @@ export default function MyBookingsPage() {
       <div className="container" style={{ maxWidth: 700 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
           <Calendar size={22} style={{ color: 'var(--green)' }} />
-          <h1 style={{ fontSize: 20, fontWeight: 700 }}>Mis turnos</h1>
+          <h1 className="display-font" style={{ fontSize: 26, lineHeight: 1.1 }}>Mis turnos</h1>
         </div>
 
         {!loading && noCanceladas.length > 0 && (

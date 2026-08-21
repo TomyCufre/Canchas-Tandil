@@ -63,7 +63,7 @@ export default function ProfilePage() {
   return (
     <div className="page">
       <div className="container" style={{ maxWidth: 480 }}>
-        <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24 }}>Mi perfil</h1>
+        <h1 className="display-font" style={{ fontSize: 26, lineHeight: 1.1, marginBottom: 24 }}>Mi perfil</h1>
 
         {/* Avatar */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>

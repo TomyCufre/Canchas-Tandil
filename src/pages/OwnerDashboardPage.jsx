@@ -107,7 +107,7 @@ export default function OwnerDashboardPage() {
     <div className="page">
       <div className="container">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 700 }}>Panel de administración</h1>
+          <h1 className="display-font" style={{ fontSize: 28, lineHeight: 1.1 }}>Panel de administración</h1>
           <Link to="/panel/canchas/nueva" className="btn btn-primary"><Plus size={16} /> Nueva cancha</Link>
         </div>
 

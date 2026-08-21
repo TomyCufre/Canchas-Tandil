@@ -119,7 +119,7 @@ export default function RegisterPage() {
           <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--green-50)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
             <Mail size={28} style={{ color: 'var(--green)' }} />
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>Confirmá tu email</h1>
+          <h1 className="display-font" style={{ fontSize: 28, lineHeight: 1.1, marginBottom: 8 }}>Confirmá tu email</h1>
           <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.6, marginBottom: 24 }}>
             Te enviamos un enlace de confirmación a <strong style={{ color: 'var(--text)' }}>{form.email}</strong>. Abrilo para activar tu cuenta.
           </p>
@@ -143,10 +143,10 @@ export default function RegisterPage() {
       <div className="page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 56px)', padding: '24px 16px' }}>
         <div style={{ width: '100%', maxWidth: 380 }}>
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
-            <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--green-50)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
               <MessageCircle size={28} style={{ color: '#25d366' }} />
             </div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>Verificá tu WhatsApp</h1>
+            <h1 className="display-font" style={{ fontSize: 28, lineHeight: 1.1, marginBottom: 8 }}>Verificá tu WhatsApp</h1>
             <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.6 }}>
               Te mandamos un código al <strong style={{ color: 'var(--text)' }}>{form.telefono}</strong>. Ingresalo para terminar de crear tu cuenta.
             </p>
@@ -202,7 +202,7 @@ export default function RegisterPage() {
       <div style={{ width: '100%', maxWidth: 420 }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <img src="/logo-reducido.png" alt="Canchas Tandil" style={{ width: '100%', maxWidth: 200, height: 'auto', margin: '0 auto 8px', display: 'block' }} />
-          <h1 style={{ fontSize: 22, fontWeight: 700 }}>Crear cuenta</h1>
+          <h1 className="display-font" style={{ fontSize: 28, lineHeight: 1.1 }}>Crear cuenta</h1>
           <p style={{ color: 'var(--muted)', fontSize: 14, marginTop: 4 }}>Unite a Canchas Tandil</p>
         </div>
 

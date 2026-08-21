@@ -176,7 +176,7 @@ export default function CourtFormPage() {
       <div className="container" style={{ maxWidth: 640 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
           <button onClick={() => navigate('/panel')} className="btn btn-ghost btn-sm"><ArrowLeft size={16} /></button>
-          <h1 style={{ fontSize: 20, fontWeight: 700 }}>{esEdicion ? 'Editar cancha' : 'Nueva cancha'}</h1>
+          <h1 className="display-font" style={{ fontSize: 26, lineHeight: 1.1 }}>{esEdicion ? 'Editar cancha' : 'Nueva cancha'}</h1>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>

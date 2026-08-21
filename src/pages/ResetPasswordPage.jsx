@@ -49,7 +49,7 @@ export default function ResetPasswordPage() {
   if (ok) return wrap(
     <div style={{ textAlign: 'center' }}>
       <CheckCircle size={56} style={{ color: 'var(--green)', margin: '0 auto 16px' }} />
-      <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>¡Contraseña actualizada!</h1>
+      <h1 className="display-font" style={{ fontSize: 28, lineHeight: 1.1, marginBottom: 8 }}>¡Contraseña actualizada!</h1>
       <p style={{ color: 'var(--muted)', fontSize: 14 }}>Ya podés usar tu nueva contraseña. Te llevamos al inicio…</p>
     </div>
   )
@@ -57,7 +57,7 @@ export default function ResetPasswordPage() {
   if (sesion === false) return wrap(
     <div style={{ textAlign: 'center' }}>
       <div style={{ fontSize: 48, marginBottom: 12 }}>⏳</div>
-      <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Enlace inválido o expirado</h1>
+      <h1 className="display-font" style={{ fontSize: 26, lineHeight: 1.1, marginBottom: 8 }}>Enlace inválido o expirado</h1>
       <p style={{ color: 'var(--muted)', fontSize: 14, marginBottom: 20 }}>
         Abrí el enlace más reciente desde tu email, o pedí uno nuevo.
       </p>
@@ -71,7 +71,7 @@ export default function ResetPasswordPage() {
         <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--green-50)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
           <KeyRound size={28} style={{ color: 'var(--green)' }} />
         </div>
-        <h1 style={{ fontSize: 22, fontWeight: 700 }}>Nueva contraseña</h1>
+        <h1 className="display-font" style={{ fontSize: 28, lineHeight: 1.1 }}>Nueva contraseña</h1>
         <p style={{ color: 'var(--muted)', fontSize: 14, marginTop: 4 }}>Elegí una contraseña nueva para tu cuenta</p>
       </div>
 

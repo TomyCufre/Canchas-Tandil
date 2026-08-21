@@ -42,7 +42,7 @@ export default function LoginPage() {
           <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--green-50)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
             <Mail size={28} style={{ color: 'var(--green)' }} />
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>Revisá tu email</h1>
+          <h1 className="display-font" style={{ fontSize: 28, lineHeight: 1.1, marginBottom: 8 }}>Revisá tu email</h1>
           <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.6, marginBottom: 24 }}>
             Si existe una cuenta con <strong style={{ color: 'var(--text)' }}>{form.email}</strong>, te enviamos un enlace para restablecer tu contraseña. Abrilo desde este dispositivo.
           </p>
@@ -62,7 +62,7 @@ export default function LoginPage() {
       <div style={{ width: '100%', maxWidth: 380, padding: '0 16px' }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <img src="/logo-reducido.png" alt="Canchas Tandil" style={{ width: '100%', maxWidth: 200, height: 'auto', margin: '0 auto 8px', display: 'block' }} />
-          <h1 style={{ fontSize: 22, fontWeight: 700 }}>{modo === 'login' ? 'Bienvenido de nuevo' : 'Recuperar contraseña'}</h1>
+          <h1 className="display-font" style={{ fontSize: 28, lineHeight: 1.1 }}>{modo === 'login' ? 'Bienvenido de nuevo' : 'Recuperar contraseña'}</h1>
           <p style={{ color: 'var(--muted)', fontSize: 14, marginTop: 4 }}>
             {modo === 'login' ? 'Ingresá a tu cuenta de Canchas Tandil' : 'Te enviamos un link para crear una nueva'}
           </p>

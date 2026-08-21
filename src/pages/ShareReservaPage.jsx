@@ -36,7 +36,7 @@ export default function ShareReservaPage() {
   if (!reserva) return (
     <div className="page"><div className="container" style={{ textAlign: 'center', paddingTop: 64 }}>
       <div style={{ fontSize: 56, marginBottom: 16 }}>🔍</div>
-      <h1 style={{ fontSize: 20, fontWeight: 700 }}>Reserva no encontrada</h1>
+      <h1 className="display-font" style={{ fontSize: 26, lineHeight: 1.1 }}>Reserva no encontrada</h1>
       <p style={{ color: 'var(--muted)', marginTop: 8 }}>El código <code>{codigo}</code> no existe.</p>
       <a href="/" className="btn btn-primary" style={{ marginTop: 20 }}>Ver canchas</a>
     </div></div>
@@ -66,7 +66,7 @@ export default function ShareReservaPage() {
             <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.85, marginBottom: 6 }}>
               {TIPO_LABEL[cancha.tipo] || cancha.tipo}
             </div>
-            <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{cancha.nombre}</h1>
+            <h1 className="display-font" style={{ fontSize: 28, lineHeight: 1.1, marginBottom: 4 }}>{cancha.nombre}</h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, opacity: 0.9 }}>
               <MapPin size={13} />{cancha.direccion}
             </div>

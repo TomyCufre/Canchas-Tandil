@@ -117,7 +117,7 @@ export default function ManageSchedulePage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
           <button onClick={() => navigate('/panel')} className="btn btn-ghost btn-sm"><ArrowLeft size={16} /></button>
           <div>
-            <h1 style={{ fontSize: 20, fontWeight: 700 }}>Gestión de horarios</h1>
+            <h1 className="display-font" style={{ fontSize: 26, lineHeight: 1.1 }}>Gestión de horarios</h1>
             <p style={{ fontSize: 13, color: 'var(--muted)' }}>{cancha.nombre}</p>
           </div>
         </div>

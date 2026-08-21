@@ -43,7 +43,7 @@ export default function AdminPage() {
     return (
       <div className="page"><div className="container" style={{ textAlign: 'center', paddingTop: 64 }}>
         <div style={{ fontSize: 56, marginBottom: 16 }}>🔒</div>
-        <h1 style={{ fontSize: 20, fontWeight: 700 }}>Acceso restringido</h1>
+        <h1 className="display-font" style={{ fontSize: 26, lineHeight: 1.1 }}>Acceso restringido</h1>
         <p style={{ color: 'var(--muted)', marginTop: 8 }}>Esta sección es solo para administradores.</p>
         <Link to="/" className="btn btn-primary" style={{ marginTop: 20 }}>Volver al inicio</Link>
       </div></div>
@@ -55,7 +55,7 @@ export default function AdminPage() {
       <div className="container" style={{ maxWidth: 700 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
           <ShieldCheck size={22} style={{ color: 'var(--green)' }} />
-          <h1 style={{ fontSize: 20, fontWeight: 700 }}>Solicitudes de dueño</h1>
+          <h1 className="display-font" style={{ fontSize: 26, lineHeight: 1.1 }}>Solicitudes de dueño</h1>
         </div>
         <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 20 }}>
           Aprobá o rechazá a quienes piden registrar canchas. Al aprobar, la cuenta pasa a ser dueño y puede publicar canchas.
