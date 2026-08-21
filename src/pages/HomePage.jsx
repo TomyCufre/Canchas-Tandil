@@ -122,55 +122,93 @@ export default function HomePage() {
   const precioMinDB = canchas.length ? Math.min(...canchas.map(c => c.precio_hora)) : 0
   const precioMaxDB = canchas.length ? Math.max(...canchas.map(c => c.precio_hora)) : 50000
 
+  // Chip de filtro rápido (estilo "etiqueta técnica" del sistema de diseño)
+  const chip = (activo) => ({
+    flexShrink: 0,
+    fontFamily: 'var(--font-mono-caps)',
+    fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em',
+    padding: '8px 14px',
+    borderRadius: 'var(--radius)',
+    cursor: 'pointer',
+    transition: 'all .15s',
+    border: `1px solid ${activo ? 'var(--green)' : 'var(--border-dark)'}`,
+    background: activo ? 'var(--green-50)' : 'transparent',
+    color: activo ? 'var(--green)' : 'var(--muted)',
+    display: 'inline-flex', alignItems: 'center', gap: 6,
+  })
+
   return (
-    <div className="page">
-      <div className="container">
-        {/* Hero + búsqueda */}
-        <div style={{
-          background: 'linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%)',
-          borderRadius: 'var(--radius-lg)', padding: '32px 24px', marginBottom: 20,
-          color: 'white', textAlign: 'center',
-        }}>
-          <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 8 }}>Canchas en Tandil 🏟️</h1>
-          <p style={{ fontSize: 15, opacity: 0.9, marginBottom: 20 }}>Encontrá y reservá tu cancha favorita en segundos</p>
-          <div style={{ position: 'relative', maxWidth: 480, margin: '0 auto' }}>
-            <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)' }} />
+    <div className="page" style={{ paddingTop: 0 }}>
+      {/* ── Hero ─────────────────────────────────────────────── */}
+      <section style={{
+        position: 'relative',
+        overflow: 'hidden',
+        background: 'linear-gradient(135deg, var(--green-50) 0%, var(--bg) 60%)',
+        borderBottom: '1px solid var(--border)',
+        marginBottom: 24,
+      }}>
+        {/* Líneas de césped, sutiles */}
+        <div aria-hidden style={{
+          position: 'absolute', inset: 0, opacity: 0.5,
+          background: 'repeating-linear-gradient(90deg, transparent 0 56px, color-mix(in srgb, var(--green) 8%, transparent) 56px 112px)',
+          pointerEvents: 'none',
+        }} />
+        {/* Resplandor de reflector */}
+        <div aria-hidden style={{
+          position: 'absolute', top: '-40%', right: '-10%', width: 420, height: 420, borderRadius: '50%',
+          background: 'radial-gradient(circle, color-mix(in srgb, var(--green) 22%, transparent) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+
+        <div className="container" style={{ position: 'relative', padding: '40px 16px 32px' }}>
+          <h1 className="display-font" style={{
+            fontSize: 'clamp(30px, 7vw, 48px)', lineHeight: 1, fontStyle: 'italic',
+            color: 'var(--text)', marginBottom: 10,
+          }}>
+            Canchas en <span style={{ color: 'var(--green)' }}>Tandil</span>
+          </h1>
+          <p style={{ fontSize: 16, color: 'var(--text-light)', marginBottom: 22, maxWidth: 460 }}>
+            Encontrá y reservá tu cancha favorita en segundos. ¡El partido te espera!
+          </p>
+
+          <div style={{ position: 'relative', maxWidth: 520 }}>
+            <Search size={18} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)', pointerEvents: 'none' }} />
             <input
               className="form-input"
               placeholder="Buscar por nombre o dirección..."
               value={busqueda}
               onChange={e => setBusqueda(e.target.value)}
-              style={{ paddingLeft: 36, background: 'white', border: 'none' }}
+              style={{ paddingLeft: 42, height: 48, fontSize: 15, boxShadow: 'var(--shadow-md)' }}
             />
           </div>
         </div>
+      </section>
 
-        {/* Barra de filtros */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-          <button
-            onClick={() => setMostrarFiltros(f => !f)}
-            className={`btn btn-sm ${mostrarFiltros ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ flexShrink: 0 }}
-          >
-            <SlidersHorizontal size={14} /> Filtros {hayFiltrosActivos && <span className="badge badge-green" style={{ fontSize: 10, padding: '1px 6px', marginLeft: 4 }}>!</span>}
+      <div className="container">
+        {/* ── Filtros rápidos ────────────────────────────────── */}
+        <div style={{ marginBottom: 14 }}>
+          <div className="mono-caps" style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 10 }}>Modalidad</div>
+          <div className="no-scrollbar" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+            {TIPOS_FILTRO.map(tipo => (
+              <button key={tipo} onClick={() => setTipoFiltro(tipo)} style={chip(tipoFiltro === tipo)}>
+                {tipo}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Controles ──────────────────────────────────────── */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+          <button onClick={() => setMostrarFiltros(f => !f)} style={chip(mostrarFiltros)}>
+            <SlidersHorizontal size={14} /> Filtros
+            {hayFiltrosActivos && <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--warn)' }} />}
           </button>
 
           {user && (
-            <button onClick={() => setSoloFavoritos(f => !f)}
-              className={`btn btn-sm ${soloFavoritos ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ flexShrink: 0 }}>
+            <button onClick={() => setSoloFavoritos(f => !f)} style={chip(soloFavoritos)}>
               <Heart size={14} style={{ fill: soloFavoritos ? 'currentColor' : 'none' }} /> Favoritos
             </button>
           )}
-
-          {/* Tipos rápidos */}
-          {TIPOS_FILTRO.map(tipo => (
-            <button key={tipo} onClick={() => setTipoFiltro(tipo)}
-              className={`btn btn-sm ${tipoFiltro === tipo ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ flexShrink: 0 }}>
-              {tipo}
-            </button>
-          ))}
 
           {hayFiltrosActivos && (
             <button onClick={limpiarFiltros} className="btn btn-ghost btn-sm" style={{ color: 'var(--error)', flexShrink: 0 }}>
@@ -179,7 +217,7 @@ export default function HomePage() {
           )}
 
           <select value={ordenar} onChange={e => handleOrdenar(e.target.value)}
-            className="form-select" style={{ marginLeft: 'auto', width: 'auto', fontSize: 13, padding: '6px 10px' }}>
+            className="form-select" style={{ marginLeft: 'auto', width: 'auto', fontSize: 13, padding: '7px 10px' }}>
             <option value="recientes">Más recientes</option>
             <option value="cercania">Más cercanas</option>
             <option value="precio_asc">Precio: menor a mayor</option>
@@ -188,12 +226,12 @@ export default function HomePage() {
           </select>
         </div>
 
-        {/* Panel de filtros avanzados */}
+        {/* ── Filtros avanzados ──────────────────────────────── */}
         {mostrarFiltros && (
           <div className="card" style={{ padding: 20, marginBottom: 16 }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, alignItems: 'flex-end' }}>
               <div className="form-group" style={{ margin: 0, flex: 1, minWidth: 200 }}>
-                <label className="form-label">Precio máximo por hora</label>
+                <label className="form-label">Precio máximo por turno</label>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <input
                     type="range"
@@ -202,9 +240,9 @@ export default function HomePage() {
                     step={1000}
                     value={precioMax || precioMaxDB}
                     onChange={e => setPrecioMax(e.target.value)}
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, accentColor: 'var(--green)' }}
                   />
-                  <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--green)', minWidth: 80, textAlign: 'right' }}>
+                  <span className="mono-caps" style={{ fontSize: 14, color: 'var(--green)', minWidth: 84, textAlign: 'right' }}>
                     ${Number(precioMax || precioMaxDB).toLocaleString('es-AR')}
                   </span>
                 </div>
@@ -223,7 +261,7 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Resultados */}
+        {/* ── Resultados ─────────────────────────────────────── */}
         {loading ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
             {Array.from({ length: 6 }).map((_, i) => (
@@ -245,22 +283,39 @@ export default function HomePage() {
             <p>No se encontraron canchas</p>
             <span>
               {hayFiltrosActivos
-                ? <button onClick={limpiarFiltros} style={{ color: 'var(--green)', background: 'none', border: 'none', cursor: 'pointer' }}>Limpiar filtros</button>
+                ? <button onClick={limpiarFiltros} style={{ color: 'var(--green)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>Limpiar filtros</button>
                 : 'Aún no hay canchas registradas'}
             </span>
           </div>
         ) : (
           <>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-              <p style={{ color: 'var(--muted)', fontSize: 13, margin: 0 }}>
-                {filtradas.length} {filtradas.length === 1 ? 'cancha encontrada' : 'canchas encontradas'}
-                {precioMax && Number(precioMax) < precioMaxDB && ` · hasta $${Number(precioMax).toLocaleString('es-AR')}/h`}
-              </p>
-              <div style={{ display: 'flex', gap: 4 }}>
-                <button onClick={() => setVista('lista')} className={`btn btn-sm ${vista === 'lista' ? 'btn-primary' : 'btn-secondary'}`}>
+              <h2 className="display-font" style={{ fontSize: 20, display: 'flex', alignItems: 'center', gap: 10, margin: 0 }}>
+                <span style={{ width: 4, height: 20, background: 'var(--green)', borderRadius: 2, display: 'inline-block' }} />
+                {filtradas.length} {filtradas.length === 1 ? 'cancha' : 'canchas'}
+                {precioMax && Number(precioMax) < precioMaxDB && (
+                  <span className="mono-caps" style={{ fontSize: 11, color: 'var(--muted)' }}>
+                    · hasta ${Number(precioMax).toLocaleString('es-AR')}
+                  </span>
+                )}
+              </h2>
+              <div style={{ display: 'flex', gap: 4, border: '1px solid var(--border-dark)', borderRadius: 'var(--radius)', overflow: 'hidden' }}>
+                <button onClick={() => setVista('lista')}
+                  className="mono-caps"
+                  style={{
+                    fontSize: 11, padding: '7px 12px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5,
+                    background: vista === 'lista' ? 'var(--green-50)' : 'transparent',
+                    color: vista === 'lista' ? 'var(--green)' : 'var(--muted)',
+                  }}>
                   <List size={14} /> Lista
                 </button>
-                <button onClick={() => setVista('mapa')} className={`btn btn-sm ${vista === 'mapa' ? 'btn-primary' : 'btn-secondary'}`}>
+                <button onClick={() => setVista('mapa')}
+                  className="mono-caps"
+                  style={{
+                    fontSize: 11, padding: '7px 12px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5,
+                    background: vista === 'mapa' ? 'var(--green-50)' : 'transparent',
+                    color: vista === 'mapa' ? 'var(--green)' : 'var(--muted)',
+                  }}>
                   <MapIcon size={14} /> Mapa
                 </button>
               </div>
