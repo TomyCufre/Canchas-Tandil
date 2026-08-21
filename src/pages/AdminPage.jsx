@@ -80,7 +80,7 @@ export default function AdminPage() {
                   </div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
                     <button onClick={() => resolver(s.solicitud_id, true)} disabled={accionando === s.solicitud_id}
-                      className="btn btn-sm" style={{ background: 'var(--green)', color: 'white', border: 'none' }}>
+                      className="btn btn-sm" style={{ background: 'var(--green)', color: 'var(--cta-text)', border: 'none' }}>
                       {accionando === s.solicitud_id ? '...' : <><CheckCircle size={14} /> Aprobar</>}
                     </button>
                     <button onClick={() => resolver(s.solicitud_id, false)} disabled={accionando === s.solicitud_id}

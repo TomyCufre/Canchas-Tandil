@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { timeToHour, hourToTime } from '../lib/tipoCancha'
+import { timeToHour } from '../lib/tipoCancha'
 
 const HORAS = Array.from({ length: 16 }, (_, i) => i + 8) // 8 a 23 (slots de 1h, el último termina a las 24)
 
@@ -32,7 +32,11 @@ export default function TimeSlotGrid({ canchaId, fecha, diaHorarios, onSelect, s
   }
 
   if (loading) {
-    return <div className="loading-center" style={{ padding: 20 }}><div className="spinner" style={{ width: 24, height: 24 }} /></div>
+    return (
+      <div className="slot-grid">
+        {HORAS.map(h => <div key={h} className="skeleton" style={{ height: 54 }} />)}
+      </div>
+    )
   }
 
   const reservadasHoras = new Set(reservas.map(r => timeToHour(r.hora_inicio)))
@@ -58,48 +62,96 @@ export default function TimeSlotGrid({ canchaId, fecha, diaHorarios, onSelect, s
         const seleccionado = selectedHora === hora
         const pasado = esHoy && hora <= ahora.getHours()
 
-        if (pasado) {
-          return (
-            <div key={hora} style={slotStyle('pasado')} title="Ya pasó">
-              <span>{hora}:00</span>
-            </div>
-          )
-        }
-        if (!disponible) {
-          return (
-            <div key={hora} style={slotStyle('disabled')} title="No disponible">
-              <span>{hora}:00</span>
-            </div>
-          )
-        }
+        if (pasado)       return <Slot key={hora} hora={hora} estado="pasado" />
+        if (!disponible)  return <Slot key={hora} hora={hora} estado="cerrado" />
+        if (ocupado)      return <Slot key={hora} hora={hora} estado="ocupado" />
 
         return (
-          <button
+          <Slot
             key={hora}
-            onClick={() => !ocupado && onSelect(hora)}
-            disabled={ocupado}
-            style={slotStyle(ocupado ? 'ocupado' : seleccionado ? 'selected' : 'libre')}
-            title={ocupado ? 'Ocupado' : 'Disponible'}
-          >
-            {hora}:00
-          </button>
+            hora={hora}
+            estado={seleccionado ? 'seleccionado' : 'libre'}
+            onClick={() => onSelect(hora)}
+          />
         )
       })}
     </div>
   )
 }
 
-function slotStyle(estado) {
-  const base = {
-    padding: '10px 4px', borderRadius: 'var(--radius)', fontSize: 13, fontWeight: 500,
-    border: '1px solid', cursor: 'pointer', textAlign: 'center', transition: 'all 0.15s',
-  }
+const ETIQUETA = {
+  libre: 'Libre',
+  seleccionado: 'Elegido',
+  ocupado: 'Reservado',
+  pasado: 'Pasó',
+  cerrado: 'Cerrado',
+}
+
+function Slot({ hora, estado, onClick }) {
+  const interactivo = estado === 'libre' || estado === 'seleccionado'
+  const Tag = interactivo ? 'button' : 'div'
+
+  return (
+    <Tag
+      onClick={onClick}
+      disabled={interactivo ? undefined : true}
+      title={ETIQUETA[estado]}
+      style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
+        padding: '9px 4px',
+        borderRadius: 'var(--radius)',
+        border: '1px solid',
+        textAlign: 'center',
+        transition: 'all .15s',
+        cursor: interactivo ? 'pointer' : 'not-allowed',
+        fontFamily: 'var(--font-mono-caps)',
+        ...estilo(estado),
+      }}
+    >
+      <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.02em' }}>{hora}:00</span>
+      <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.75 }}>
+        {ETIQUETA[estado]}
+      </span>
+    </Tag>
+  )
+}
+
+function estilo(estado) {
   switch (estado) {
-    case 'libre':    return { ...base, background: 'var(--green-50)', borderColor: '#86efac', color: 'var(--green-dark)' }
-    case 'ocupado':  return { ...base, background: '#f1f5f9', borderColor: 'var(--border)', color: 'var(--muted)', cursor: 'not-allowed', textDecoration: 'line-through' }
-    case 'pasado':   return { ...base, background: 'transparent', borderColor: '#f1f5f9', color: '#cbd5e1', cursor: 'not-allowed' }
-    case 'selected': return { ...base, background: 'var(--green)', borderColor: 'var(--green-dark)', color: 'white' }
-    case 'disabled': return { ...base, background: '#fafafa', borderColor: 'var(--border)', color: '#d1d5db', cursor: 'not-allowed', borderStyle: 'dashed' }
-    default: return base
+    case 'seleccionado':
+      return {
+        background: 'var(--green)',
+        borderColor: 'var(--green)',
+        color: 'var(--cta-text)',
+        boxShadow: '0 0 0 3px color-mix(in srgb, var(--green) 25%, transparent)',
+      }
+    case 'libre':
+      return {
+        background: 'var(--green-50)',
+        borderColor: 'color-mix(in srgb, var(--green) 45%, transparent)',
+        color: 'var(--green)',
+      }
+    case 'ocupado':
+      return {
+        background: 'var(--surface-2)',
+        borderColor: 'var(--border)',
+        color: 'var(--muted)',
+        textDecoration: 'line-through',
+      }
+    case 'pasado':
+      return {
+        background: 'transparent',
+        borderColor: 'var(--border)',
+        color: 'var(--muted)',
+        opacity: 0.45,
+      }
+    default: // cerrado
+      return {
+        background: 'transparent',
+        borderColor: 'var(--border)',
+        borderStyle: 'dashed',
+        color: 'var(--muted)',
+        opacity: 0.6,
+      }
   }
 }

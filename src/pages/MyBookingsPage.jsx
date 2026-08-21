@@ -224,10 +224,10 @@ export default function MyBookingsPage() {
                   {/* Seña pendiente de enviar */}
                   {!yaPaso && r.estado !== 'cancelada' && r.canchas?.requiere_sena && r.canchas?.sena_monto > 0 && (
                     <div style={{
-                      background: r.sena_pagada ? 'var(--green-50)' : '#fffbeb',
-                      border: `1px solid ${r.sena_pagada ? '#86efac' : '#fcd34d'}`,
+                      background: r.sena_pagada ? 'var(--green-50)' : 'var(--amber-bg)',
+                      border: `1px solid ${r.sena_pagada ? '#86efac' : 'var(--amber-border)'}`,
                       borderRadius: 'var(--radius)', padding: '8px 12px', marginBottom: 12,
-                      fontSize: 12, color: r.sena_pagada ? 'var(--green-dark)' : '#92400e', lineHeight: 1.5,
+                      fontSize: 12, color: r.sena_pagada ? 'var(--green-dark)' : 'var(--amber-fg)', lineHeight: 1.5,
                     }}>
                       {r.sena_pagada ? (
                         <>✅ <b>Seña recibida</b> — el dueño confirmó tu pago de ${Number(r.canchas.sena_monto).toLocaleString('es-AR')}.</>

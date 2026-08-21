@@ -52,7 +52,7 @@ export default function ShareReservaPage() {
     || `https://www.google.com/maps/search/${encodeURIComponent(cancha.direccion + ' Tandil Buenos Aires')}`
 
   return (
-    <div className="page" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)', minHeight: '100vh' }}>
+    <div className="page" style={{ background: 'linear-gradient(135deg, var(--green-50) 0%, var(--bg) 100%)', minHeight: '100vh' }}>
       <div className="container" style={{ maxWidth: 480, paddingTop: 32, paddingBottom: 48 }}>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <span style={{ fontSize: 40 }}>⚽</span>
@@ -62,7 +62,7 @@ export default function ShareReservaPage() {
         {/* Ticket */}
         <div className="card" style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.12)' }}>
           {/* Header verde */}
-          <div style={{ background: 'var(--green)', padding: '24px 24px 20px', color: 'white' }}>
+          <div style={{ background: 'var(--green)', padding: '24px 24px 20px', color: 'var(--cta-text)' }}>
             <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.85, marginBottom: 6 }}>
               {TIPO_LABEL[cancha.tipo] || cancha.tipo}
             </div>

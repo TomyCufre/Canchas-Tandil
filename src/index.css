@@ -41,6 +41,8 @@
   --badge-blue-bg: #dbeafe;   --badge-blue-fg: #1d4ed8;
 
   --info-bg: #eff6ff; --info-fg: #1d4ed8; --info-border: #bfdbfe;
+  --amber-bg: #fffbeb; --amber-border: #fcd34d; --amber-fg: #92400e;
+  --blue-bg: #eff6ff; --blue-fg: #1d4ed8;
   --skeleton: #e8edf2;
   --overlay: rgba(15, 23, 42, 0.45);
 
@@ -84,6 +86,8 @@
   --badge-blue-bg: #12294a;   --badge-blue-fg: #93c5fd;
 
   --info-bg: #142033; --info-fg: #93c5fd; --info-border: #24406b;
+  --amber-bg: #2f2408; --amber-border: #7a5c12; --amber-fg: #fcd34d;
+  --blue-bg: #142033; --blue-fg: #93c5fd;
   --skeleton: #232a3a;
   --overlay: rgba(0, 0, 0, 0.65);
 

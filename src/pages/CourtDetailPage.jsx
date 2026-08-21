@@ -172,7 +172,7 @@ export default function CourtDetailPage() {
               <PhotoGallery fotos={fotos} />
               <div style={{ marginTop: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
-                  <h1 style={{ fontSize: 22, fontWeight: 700 }}>{cancha.nombre}</h1>
+                  <h1 className="display-font" style={{ fontSize: 28, lineHeight: 1.05 }}>{cancha.nombre}</h1>
                   <span className="badge badge-green" style={{ fontSize: 13 }}>{tipoLabel}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--muted)', fontSize: 14, marginBottom: 12 }}>
@@ -190,10 +190,10 @@ export default function CourtDetailPage() {
                   {cancha.tiene_pecheras        && <div style={chip}>🎽 Pecheras</div>}
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {cancha.acepta_presencial && <div style={{ ...chip, background: '#eff6ff', color: '#1d4ed8' }}><CreditCard size={13} /> Pago en el lugar</div>}
-                  {cancha.acepta_online     && <div style={{ ...chip, background: '#eff6ff', color: '#1d4ed8' }}><CreditCard size={13} /> Mercado Pago</div>}
+                  {cancha.acepta_presencial && <div style={{ ...chip, background: 'var(--blue-bg)', color: 'var(--blue-fg)' }}><CreditCard size={13} /> Pago en el lugar</div>}
+                  {cancha.acepta_online     && <div style={{ ...chip, background: 'var(--blue-bg)', color: 'var(--blue-fg)' }}><CreditCard size={13} /> Mercado Pago</div>}
                   {cancha.requiere_sena && cancha.sena_monto > 0 && (
-                    <div style={{ ...chip, background: '#fffbeb', color: '#92400e' }}>
+                    <div style={{ ...chip, background: 'var(--amber-bg)', color: 'var(--amber-fg)' }}>
                       🔒 Seña ${Number(cancha.sena_monto).toLocaleString('es-AR')}
                     </div>
                   )}
@@ -244,7 +244,7 @@ export default function CourtDetailPage() {
 
           {/* Reservas */}
           <div className="card" style={{ padding: 20 }}>
-            <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>
+            <h2 className="display-font" style={{ fontSize: 20, marginBottom: 16 }}>
               <Clock size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 6 }} />
               Seleccioná un turno
             </h2>
@@ -259,23 +259,11 @@ export default function CourtDetailPage() {
                   cursor: 'pointer', flexShrink: 0, minWidth: 52,
                   color: fechaIdx === idx ? 'var(--green-dark)' : 'var(--text)',
                 }}>
-                  <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', opacity: 0.7 }}>{DIAS_SEMANA[fecha.getDay()]}</span>
-                  <span style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.1 }}>{fecha.getDate()}</span>
+                  <span className="mono-caps" style={{ fontSize: 10, opacity: 0.75 }}>{DIAS_SEMANA[fecha.getDay()]}</span>
+                  <span className="display-font" style={{ fontSize: 20, lineHeight: 1.1 }}>{fecha.getDate()}</span>
                   <span style={{ fontSize: 10, opacity: 0.7 }}>{MESES[fecha.getMonth()]}</span>
                 </button>
               ))}
-            </div>
-
-            <div style={{ display: 'flex', gap: 16, marginBottom: 12, fontSize: 12, color: 'var(--muted)' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ width: 10, height: 10, borderRadius: 3, background: 'var(--green-50)', border: '1px solid #86efac', display: 'inline-block' }} /> Disponible
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ width: 10, height: 10, borderRadius: 3, background: '#f1f5f9', border: '1px solid var(--border)', display: 'inline-block' }} /> Ocupado
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ width: 10, height: 10, borderRadius: 3, background: 'transparent', border: '1px solid #f1f5f9', display: 'inline-block' }} /> Pasó
-              </span>
             </div>
 
             <TimeSlotGrid
@@ -361,7 +349,7 @@ export default function CourtDetailPage() {
                 ))}
 
                 {cancha.requiere_sena && cancha.sena_monto > 0 && (
-                  <div className="alert" style={{ background: '#fffbeb', border: '1px solid #fcd34d', color: '#92400e', fontSize: 13, lineHeight: 1.5 }}>
+                  <div className="alert" style={{ background: 'var(--amber-bg)', border: '1px solid var(--amber-border)', color: 'var(--amber-fg)', fontSize: 13, lineHeight: 1.5 }}>
                     🔒 <b>Esta cancha pide seña de ${Number(cancha.sena_monto).toLocaleString('es-AR')}</b> para asegurar el turno.
                     El resto (${Math.max(0, Number(cancha.precio_hora) - Number(cancha.sena_monto)).toLocaleString('es-AR')}) lo abonás en la cancha.
                     Después de reservar te mostramos cómo enviarla.
@@ -453,16 +441,16 @@ export default function CourtDetailPage() {
               </div>
 
               {cancha.requiere_sena && cancha.sena_monto > 0 && (
-                <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 'var(--radius-lg)', padding: 16, marginBottom: 20, textAlign: 'left' }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#92400e', marginBottom: 6 }}>
+                <div style={{ background: 'var(--amber-bg)', border: '1px solid var(--amber-border)', borderRadius: 'var(--radius-lg)', padding: 16, marginBottom: 20, textAlign: 'left' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--amber-fg)', marginBottom: 6 }}>
                     🔒 Enviá la seña para confirmar tu turno
                   </div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: '#92400e', marginBottom: 6 }}>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--amber-fg)', marginBottom: 6 }}>
                     ${Number(cancha.sena_monto).toLocaleString('es-AR')}
                   </div>
                   {cancha.datos_pago && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                      <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, background: '#fff', padding: '4px 10px', borderRadius: 'var(--radius)', border: '1px solid #fcd34d' }}>
+                      <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, background: 'var(--card)', padding: '4px 10px', borderRadius: 'var(--radius)', border: '1px solid var(--amber-border)' }}>
                         {cancha.datos_pago}
                       </span>
                       <button onClick={() => navigator.clipboard?.writeText(cancha.datos_pago)} className="btn btn-ghost btn-sm" title="Copiar" aria-label="Copiar datos de pago">
@@ -470,7 +458,7 @@ export default function CourtDetailPage() {
                       </button>
                     </div>
                   )}
-                  <div style={{ fontSize: 12, color: '#92400e' }}>
+                  <div style={{ fontSize: 12, color: 'var(--amber-fg)' }}>
                     Avisale al dueño cuando la envíes. El resto lo abonás en la cancha.
                   </div>
                 </div>

@@ -155,7 +155,7 @@ export default function ManageSchedulePage() {
                           style={{
                             width: 32, height: 32, borderRadius: 6, cursor: 'pointer', transition: 'all 0.12s',
                             border: activo ? '2px solid #86efac' : '1px solid var(--border)',
-                            background: activo ? 'var(--green)' : '#f1f5f9',
+                            background: activo ? 'var(--green)' : 'var(--surface-2)',
                           }}
                           title={`${DIAS[diaIdx]} ${hora}:00 - ${activo ? 'activo' : 'inactivo'}`}
                         />
@@ -174,7 +174,7 @@ export default function ManageSchedulePage() {
               <span style={{ width: 16, height: 16, borderRadius: 4, background: 'var(--green)', display: 'inline-block' }} /> Activo
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ width: 16, height: 16, borderRadius: 4, background: '#f1f5f9', border: '1px solid var(--border)', display: 'inline-block' }} /> Inactivo
+              <span style={{ width: 16, height: 16, borderRadius: 4, background: 'var(--surface-2)', border: '1px solid var(--border)', display: 'inline-block' }} /> Inactivo
             </span>
           </div>
         </div>

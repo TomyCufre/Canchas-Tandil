@@ -112,10 +112,10 @@ export default function OwnerDashboardPage() {
         </div>
 
         {pendientes.length > 0 && (
-          <div className="alert" style={{ background: '#fffbeb', border: '1px solid #fcd34d', color: '#92400e', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div className="alert" style={{ background: 'var(--amber-bg)', border: '1px solid var(--amber-border)', color: 'var(--amber-fg)', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 18 }}>⏳</span>
             <span><b>{pendientes.length} reserva{pendientes.length > 1 ? 's' : ''} pendiente{pendientes.length > 1 ? 's' : ''}</b> esperando confirmación</span>
-            <button onClick={() => setTab('proximas')} className="btn btn-sm" style={{ marginLeft: 'auto', background: '#92400e', color: 'white', border: 'none' }}>Ver</button>
+            <button onClick={() => setTab('proximas')} className="btn btn-primary btn-sm" style={{ marginLeft: 'auto' }}>Ver</button>
           </div>
         )}
 
@@ -315,7 +315,7 @@ function ReservasList({ reservas, onRefresh }) {
                   <td>
                     <span className={`badge ${ESTADO_BADGE[r.estado]}`}>{r.estado}</span>
                     {r.canchas?.requiere_sena && r.canchas?.sena_monto > 0 && r.estado !== 'cancelada' && (
-                      <div style={{ fontSize: 11, marginTop: 4, fontWeight: 600, color: r.sena_pagada ? 'var(--green)' : '#92400e' }}>
+                      <div style={{ fontSize: 11, marginTop: 4, fontWeight: 600, color: r.sena_pagada ? 'var(--green)' : 'var(--amber-fg)' }}>
                         {r.sena_pagada
                           ? '🔒 Seña cobrada'
                           : `🔒 Seña $${Number(r.canchas.sena_monto).toLocaleString('es-AR')} pendiente`}
@@ -331,7 +331,7 @@ function ReservasList({ reservas, onRefresh }) {
                             onClick={() => cambiarEstado(r, 'confirmada')}
                             className="btn btn-sm"
                             disabled={accionando === r.id}
-                            style={{ background: 'var(--green)', color: 'white', border: 'none' }}
+                            style={{ background: 'var(--green)', color: 'var(--cta-text)', border: 'none' }}
                           >
                             {accionando === r.id ? '...' : <><CheckCircle size={13} /> Confirmar</>}
                           </button>
@@ -506,7 +506,7 @@ function CalendarView({ reservas, canchas, onRefresh }) {
               style={{
                 minHeight: 62, padding: '6px 4px', borderRadius: 'var(--radius)', textAlign: 'left',
                 border: `1px solid ${esHoy ? 'var(--green)' : 'var(--border)'}`,
-                background: lista.length ? (tienePendientes ? '#fffbeb' : 'var(--green-50)') : 'var(--card)',
+                background: lista.length ? (tienePendientes ? 'var(--amber-bg)' : 'var(--green-50)') : 'var(--card)',
                 cursor: clickable ? 'pointer' : 'default',
                 display: 'flex', flexDirection: 'column', gap: 4,
               }}
