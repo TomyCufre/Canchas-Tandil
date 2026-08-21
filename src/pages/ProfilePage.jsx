@@ -26,11 +26,14 @@ export default function ProfilePage() {
         if (!vivo || !data) return
         const hoy = fechaLocal()
         const mes = hoy.slice(0, 7)          // YYYY-MM
+        const anio = hoy.slice(0, 4)         // YYYY
         const activas = data.filter(r => r.estado !== 'cancelada')
         setStats({
           reservados: activas.length,
           cancelados: data.filter(r => r.estado === 'cancelada').length,
-          jugadosMes: activas.filter(r => r.fecha.startsWith(mes) && r.fecha <= hoy).length,
+          jugadosMes:  activas.filter(r => r.fecha.startsWith(mes)  && r.fecha <= hoy).length,
+          jugadosAnio: activas.filter(r => r.fecha.startsWith(anio) && r.fecha <= hoy).length,
+          anio,
           ganados:   activas.filter(r => r.resultado === 'ganado').length,
           empatados: activas.filter(r => r.resultado === 'empatado').length,
           perdidos:  activas.filter(r => r.resultado === 'perdido').length,
@@ -129,7 +132,7 @@ export default function ProfilePage() {
               Mi historial
             </h2>
 
-            <div className="grid-3" style={{ marginBottom: 12 }}>
+            <div className="grid-4" style={{ marginBottom: 12 }}>
               <div className="stat-card" style={{ padding: 16 }}>
                 <div className="stat-label">Reservados</div>
                 <div className="stat-value">{stats.reservados}</div>
@@ -139,6 +142,11 @@ export default function ProfilePage() {
                 <div className="stat-label">Jugados este mes</div>
                 <div className="stat-value" style={{ color: 'var(--green)' }}>{stats.jugadosMes}</div>
                 <div className="stat-sub">partidos</div>
+              </div>
+              <div className="stat-card" style={{ padding: 16 }}>
+                <div className="stat-label">Jugados este año</div>
+                <div className="stat-value" style={{ color: 'var(--green)' }}>{stats.jugadosAnio}</div>
+                <div className="stat-sub">en {stats.anio}</div>
               </div>
               <div className="stat-card" style={{ padding: 16 }}>
                 <div className="stat-label">Dados de baja</div>
