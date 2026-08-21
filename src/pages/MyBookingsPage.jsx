@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { timeToHour } from '../lib/tipoCancha'
-import { Calendar, X, Share2, Star, MessageCircle, CalendarPlus, Users, Trophy, Handshake, Frown } from 'lucide-react'
+import { Calendar, X, Share2, Star, MessageCircle, CalendarPlus, Users, Trophy, Handshake, Frown, CreditCard } from 'lucide-react'
 import StarRating from '../components/StarRating'
 import DividirTurnoModal from '../components/DividirTurnoModal'
 import ResultadoModal from '../components/ResultadoModal'
+import PagoModal from '../components/PagoModal'
 import { useSEO } from '../hooks/useSEO'
 import { fechaLocal } from '../lib/fecha'
 
@@ -35,6 +36,7 @@ export default function MyBookingsPage() {
   const [cancelando, setCancelando] = useState(null)
   const [modalDividir, setModalDividir] = useState(null) // reserva object
   const [modalResultado, setModalResultado] = useState(null) // reserva object
+  const [modalPago, setModalPago] = useState(null) // reserva object
   const [modalResena, setModalResena] = useState(null) // reserva object
   const [resenaForm, setResenaForm] = useState({ puntuacion: 0, comentario: '' })
   const [guardandoResena, setGuardandoResena] = useState(false)
@@ -45,7 +47,7 @@ export default function MyBookingsPage() {
   async function fetchReservas() {
     const { data: rs } = await supabase
       .from('reservas')
-      .select('*, canchas(nombre, direccion, tipo, precio_hora, requiere_sena, sena_monto, datos_pago)')
+      .select('*, canchas(nombre, direccion, tipo, precio_hora, requiere_sena, sena_monto, datos_pago, acepta_online)')
       .eq('jugador_id', user.id)
       .order('fecha', { ascending: false })
       .order('hora_inicio', { ascending: false })
@@ -254,8 +256,28 @@ export default function MyBookingsPage() {
                     </div>
                   </div>
 
+                  {/* Pago online acreditado */}
+                  {r.pago_estado === 'aprobado' && r.estado !== 'cancelada' && (
+                    <div style={{
+                      background: 'var(--green-50)',
+                      border: '1px solid color-mix(in srgb, var(--green) 40%, transparent)',
+                      borderRadius: 'var(--radius)', padding: '8px 12px', marginBottom: 12,
+                      fontSize: 12, color: 'var(--green)', lineHeight: 1.5,
+                      display: 'flex', alignItems: 'center', gap: 8,
+                    }}>
+                      <CreditCard size={14} style={{ flexShrink: 0 }} />
+                      <span>
+                        {r.pago_tipo === 'sena' ? <b>Seña pagada online</b> : <b>Turno pagado online</b>}
+                        {r.pago_monto ? ` — $${Number(r.pago_monto).toLocaleString('es-AR')}` : ''}
+                        {r.pago_tipo === 'sena' && r.canchas?.precio_hora
+                          ? `. Resta $${Math.max(0, Number(r.monto || r.canchas.precio_hora) - Number(r.pago_monto || 0)).toLocaleString('es-AR')} en la cancha.`
+                          : ''}
+                      </span>
+                    </div>
+                  )}
+
                   {/* Seña pendiente de enviar */}
-                  {!yaPaso && r.estado !== 'cancelada' && r.canchas?.requiere_sena && r.canchas?.sena_monto > 0 && (
+                  {!yaPaso && r.estado !== 'cancelada' && r.pago_estado !== 'aprobado' && r.canchas?.requiere_sena && r.canchas?.sena_monto > 0 && (
                     <div style={{
                       background: r.sena_pagada ? 'var(--green-50)' : 'var(--amber-bg)',
                       border: `1px solid ${r.sena_pagada ? '#86efac' : 'var(--amber-border)'}`,
@@ -279,6 +301,12 @@ export default function MyBookingsPage() {
                       <div style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', background: 'var(--bg)', padding: '4px 10px', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
                         # {r.codigo}
                       </div>
+                      {/* Pagar online (si la cancha lo acepta y todavía no está pago) */}
+                      {!yaPaso && r.estado !== 'cancelada' && r.canchas?.acepta_online && r.pago_estado !== 'aprobado' && (
+                        <button onClick={() => setModalPago(r)} className="btn btn-primary btn-sm">
+                          <CreditCard size={14} /> Pagar
+                        </button>
+                      )}
                       {/* Dividir el gasto entre los jugadores (turnos por jugarse) */}
                       {!yaPaso && r.estado !== 'cancelada' && (
                         <button onClick={() => setModalDividir(r)} className="btn btn-ghost btn-sm" style={{ color: 'var(--green)' }}>
@@ -349,6 +377,11 @@ export default function MyBookingsPage() {
           </div>
         )}
       </div>
+
+      {/* Pagar con Mercado Pago */}
+      {modalPago && (
+        <PagoModal reserva={modalPago} onClose={() => setModalPago(null)} />
+      )}
 
       {/* Cargar el resultado del partido */}
       {modalResultado && (

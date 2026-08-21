@@ -57,13 +57,26 @@ export default function TerminosPage() {
 
       <Seccion n="5" titulo="Precios, pagos y seña">
         <Aviso tono="info">
-          <b>La Plataforma no procesa pagos.</b> El dinero del alquiler nunca pasa por Canchas Tandil.
+          <b>La Plataforma no retiene ni administra el dinero de las reservas.</b> Todos los importes se
+          acreditan directamente en la cuenta del Establecimiento.
         </Aviso>
         <ul>
           <li>Los precios son fijados y actualizados por cada Establecimiento. El importe mostrado corresponde al turno completo.</li>
-          <li>El pago se realiza <b>directamente al Establecimiento</b>, por los medios que este acepte (efectivo, transferencia u otros).</li>
-          <li>Algunos Establecimientos pueden solicitar una <b>seña</b> para asegurar el turno. El monto y la forma de envío los define cada Establecimiento, y es este quien confirma haberla recibido.</li>
-          <li>Cualquier reclamo por cobros, devoluciones o diferencias de precio debe dirigirse al Establecimiento.</li>
+          <li>
+            <b>Pago en el lugar:</b> se abona directamente al Establecimiento por los medios que este acepte
+            (efectivo, transferencia u otros).
+          </li>
+          <li>
+            <b>Pago online:</b> los Establecimientos que lo habiliten permiten abonar el turno completo o la
+            seña a través de <b>Mercado Pago</b>. En ese caso el Establecimiento actúa como vendedor y el
+            dinero se acredita <b>directamente en su cuenta</b>; Canchas Tandil no percibe, retiene ni
+            intermedia esos fondos. Al pagar por ese medio también rigen los términos de Mercado Pago.
+          </li>
+          <li>Algunos Establecimientos pueden solicitar una <b>seña</b> para asegurar el turno. El monto lo define cada Establecimiento.</li>
+          <li>
+            Cualquier reclamo por cobros, devoluciones o diferencias de precio debe dirigirse al
+            <b> Establecimiento</b>, que es quien recibe el pago y gestiona eventuales reintegros.
+          </li>
         </ul>
       </Seccion>
 

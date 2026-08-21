@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { TIPO_LABEL, timeToHour } from '../lib/tipoCancha'
-import { Plus, Edit2, Trash2, Eye, EyeOff, Clock, CalendarCheck, CheckCircle, XCircle, MessageCircle, ChevronLeft, ChevronRight, CalendarDays, Star, MessageSquare, BarChart3, Download } from 'lucide-react'
+import { Plus, Edit2, Trash2, Eye, EyeOff, Clock, CalendarCheck, CheckCircle, XCircle, MessageCircle, ChevronLeft, ChevronRight, CalendarDays, Star, MessageSquare, BarChart3, Download, CreditCard } from 'lucide-react'
 import StarRating from '../components/StarRating'
+import CobrosPanel from '../components/CobrosPanel'
 import { useSEO } from '../hooks/useSEO'
 import { fechaLocal } from '../lib/fecha'
 
@@ -155,6 +156,9 @@ export default function OwnerDashboardPage() {
           <button className={`tab-btn ${tab === 'stats' ? 'active' : ''}`} onClick={() => setTab('stats')}>
             <BarChart3 size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />Estadísticas
           </button>
+          <button className={`tab-btn ${tab === 'cobros' ? 'active' : ''}`} onClick={() => setTab('cobros')}>
+            <CreditCard size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />Cobros
+          </button>
           <button className={`tab-btn ${tab === 'resenas' ? 'active' : ''}`} onClick={() => setTab('resenas')}>
             <Star size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />Reseñas ({resenas.length})
           </button>
@@ -228,6 +232,8 @@ export default function OwnerDashboardPage() {
         {tab === 'stats' && (
           <Estadisticas reservas={reservas} />
         )}
+
+        {tab === 'cobros' && <CobrosPanel />}
 
         {tab === 'resenas' && (
           <ResenasPanel resenas={resenas} onRefresh={fetchData} />

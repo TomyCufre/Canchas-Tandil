@@ -74,6 +74,11 @@ export default function PrivacidadPage() {
         <ul>
           <li><b>Supabase</b> — base de datos y autenticación. Los datos se alojan en servidores ubicados en <b>São Paulo, Brasil</b>.</li>
           <li><b>Vercel</b> — alojamiento del sitio y estadísticas de visitas de forma agregada y anónima.</li>
+          <li>
+            <b>Mercado Pago</b> — solo si elegís pagar online. Los datos de tu tarjeta o medio de pago los
+            procesa Mercado Pago en sus propios sistemas: <b>nunca pasan por Canchas Tandil</b> ni los
+            almacenamos. De cada pago guardamos únicamente su identificador, el importe y el estado.
+          </li>
         </ul>
         <p>
           Al utilizar la Plataforma, prestás conformidad para que tus datos sean tratados en dichos servidores,
