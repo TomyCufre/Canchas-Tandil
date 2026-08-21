@@ -11,6 +11,22 @@ export default function Navbar() {
   const { esOscuro, alternarTema } = useTheme()
   const navigate = useNavigate()
   const [pendientes, setPendientes] = useState(0)
+  const [sinResultado, setSinResultado] = useState(0)
+
+  // Partidos ya jugados a los que el usuario no les cargó el resultado
+  useEffect(() => {
+    if (!user) { setSinResultado(0); return }
+    let cancelado = false
+    supabase
+      .from('reservas')
+      .select('id', { count: 'exact', head: true })
+      .eq('jugador_id', user.id)
+      .neq('estado', 'cancelada')
+      .is('resultado', null)
+      .lt('fecha', fechaLocal())
+      .then(({ count }) => { if (!cancelado) setSinResultado(count || 0) })
+    return () => { cancelado = true }
+  }, [user])
 
   // Contador de reservas pendientes para el dueño: solo de SUS canchas y de fechas futuras
   useEffect(() => {
@@ -73,9 +89,17 @@ export default function Navbar() {
             <Link to="/" className="btn btn-ghost btn-sm hide-mobile">
               <Home size={15} /> Canchas
             </Link>
-            <Link to="/mis-turnos" className="btn btn-ghost btn-sm">
+            <Link to="/mis-turnos" className="btn btn-ghost btn-sm" style={{ position: 'relative' }}
+              title={sinResultado > 0 ? `${sinResultado} partido${sinResultado > 1 ? 's' : ''} sin resultado` : 'Mis turnos'}>
               <Calendar size={15} />
               <span className="hide-mobile">Mis turnos</span>
+              {sinResultado > 0 && (
+                <span style={{
+                  position: 'absolute', top: 0, right: 0, background: 'var(--green)', color: 'var(--cta-text)',
+                  fontSize: 9, fontWeight: 800, minWidth: 16, height: 16, borderRadius: 8,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px',
+                }}>{sinResultado > 99 ? '99+' : sinResultado}</span>
+              )}
             </Link>
             {profile.rol === 'dueno' && (
               <>

@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { timeToHour } from '../lib/tipoCancha'
-import { Calendar, X, Share2, Star, MessageCircle, CalendarPlus, Users } from 'lucide-react'
+import { Calendar, X, Share2, Star, MessageCircle, CalendarPlus, Users, Trophy, Handshake, Frown } from 'lucide-react'
 import StarRating from '../components/StarRating'
 import DividirTurnoModal from '../components/DividirTurnoModal'
+import ResultadoModal from '../components/ResultadoModal'
 import { useSEO } from '../hooks/useSEO'
 import { fechaLocal } from '../lib/fecha'
 
@@ -14,6 +15,10 @@ const ESTADO_BADGE = {
   cancelada: 'badge-red', completada: 'badge-gray',
 }
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
+
+const RESULTADO_LABEL  = { ganado: 'Ganamos', empatado: 'Empate', perdido: 'Perdimos' }
+const RESULTADO_COLOR  = { ganado: 'var(--green)', empatado: 'var(--muted)', perdido: 'var(--error)' }
+const RESULTADO_ICONO  = { ganado: Trophy, empatado: Handshake, perdido: Frown }
 
 function formatFechaHumana(fechaStr) {
   const [y, m, d] = fechaStr.split('-').map(Number)
@@ -29,6 +34,7 @@ export default function MyBookingsPage() {
   const [confirmCancel, setConfirmCancel] = useState(null)
   const [cancelando, setCancelando] = useState(null)
   const [modalDividir, setModalDividir] = useState(null) // reserva object
+  const [modalResultado, setModalResultado] = useState(null) // reserva object
   const [modalResena, setModalResena] = useState(null) // reserva object
   const [resenaForm, setResenaForm] = useState({ puntuacion: 0, comentario: '' })
   const [guardandoResena, setGuardandoResena] = useState(false)
@@ -132,6 +138,9 @@ export default function MyBookingsPage() {
   noCanceladas.forEach(r => { const n = r.canchas?.nombre; if (n) conteoCanchas[n] = (conteoCanchas[n] || 0) + 1 })
   const canchaFavorita = Object.entries(conteoCanchas).sort((a, b) => b[1] - a[1])[0]?.[0] || '—'
 
+  // Partidos ya jugados a los que les falta cargar el resultado
+  const sinResultado = noCanceladas.filter(r => r.fecha < hoy && !r.resultado)
+
   return (
     <div className="page">
       <div className="container" style={{ maxWidth: 700 }}>
@@ -139,6 +148,30 @@ export default function MyBookingsPage() {
           <Calendar size={22} style={{ color: 'var(--green)' }} />
           <h1 className="display-font" style={{ fontSize: 26, lineHeight: 1.1 }}>Mis turnos</h1>
         </div>
+
+        {!loading && sinResultado.length > 0 && (
+          <div className="card" style={{
+            padding: 16, marginBottom: 20,
+            borderColor: 'var(--green)',
+            background: 'var(--green-50)',
+            display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+          }}>
+            <Trophy size={22} style={{ color: 'var(--green)', flexShrink: 0 }} />
+            <div style={{ flex: 1, minWidth: 180 }}>
+              <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)' }}>
+                {sinResultado.length === 1
+                  ? 'Jugaste un partido, ¿cómo salió?'
+                  : `Jugaste ${sinResultado.length} partidos, ¿cómo salieron?`}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-light)' }}>
+                Cargá el resultado para llevar tu historial.
+              </div>
+            </div>
+            <button onClick={() => setModalResultado(sinResultado[0])} className="btn btn-primary btn-sm">
+              Cargar resultado
+            </button>
+          </div>
+        )}
 
         {!loading && noCanceladas.length > 0 && (
           <div className="grid-3" style={{ marginBottom: 20 }}>
@@ -252,6 +285,20 @@ export default function MyBookingsPage() {
                           <Users size={14} /> Dividir
                         </button>
                       )}
+                      {/* Resultado del partido (turnos ya jugados) */}
+                      {yaPaso && r.estado !== 'cancelada' && (
+                        <button
+                          onClick={() => setModalResultado(r)}
+                          className="btn btn-ghost btn-sm"
+                          style={{ color: r.resultado ? RESULTADO_COLOR[r.resultado] : 'var(--muted)' }}
+                          title={r.resultado ? 'Editar resultado' : 'Cargar resultado'}
+                        >
+                          {(() => { const I = RESULTADO_ICONO[r.resultado] || Trophy; return <I size={14} /> })()}
+                          {r.resultado
+                            ? `${RESULTADO_LABEL[r.resultado]}${r.marcador ? ' ' + r.marcador : ''}`
+                            : 'Resultado'}
+                        </button>
+                      )}
                       {/* Reseña si ya pasó */}
                       {yaPaso && r.estado !== 'cancelada' && (
                         <button onClick={() => abrirResena(r)} className="btn btn-ghost btn-sm" style={{ color: tieneResena ? '#f59e0b' : 'var(--muted)' }}>
@@ -302,6 +349,15 @@ export default function MyBookingsPage() {
           </div>
         )}
       </div>
+
+      {/* Cargar el resultado del partido */}
+      {modalResultado && (
+        <ResultadoModal
+          reserva={modalResultado}
+          onClose={() => setModalResultado(null)}
+          onGuardado={fetchReservas}
+        />
+      )}
 
       {/* Dividir el turno entre los jugadores */}
       {modalDividir && (

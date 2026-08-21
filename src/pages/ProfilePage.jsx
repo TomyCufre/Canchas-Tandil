@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
-import { Camera, Save, User } from 'lucide-react'
+import { Camera, Save, User, Trophy, Handshake, Frown } from 'lucide-react'
 import { normalizarTelefono } from '../lib/telefono'
+import { fechaLocal } from '../lib/fecha'
 
 export default function ProfilePage() {
   const { user, profile, setProfile } = useAuth()
@@ -12,6 +13,31 @@ export default function ProfilePage() {
   const [uploading, setUploading] = useState(false)
   const [ok, setOk] = useState(false)
   const [error, setError] = useState('')
+  const [stats, setStats] = useState(null)
+
+  // Estadísticas del jugador a partir de sus reservas
+  useEffect(() => {
+    if (!user) return
+    let vivo = true
+    supabase.from('reservas')
+      .select('fecha, estado, resultado')
+      .eq('jugador_id', user.id)
+      .then(({ data }) => {
+        if (!vivo || !data) return
+        const hoy = fechaLocal()
+        const mes = hoy.slice(0, 7)          // YYYY-MM
+        const activas = data.filter(r => r.estado !== 'cancelada')
+        setStats({
+          reservados: activas.length,
+          cancelados: data.filter(r => r.estado === 'cancelada').length,
+          jugadosMes: activas.filter(r => r.fecha.startsWith(mes) && r.fecha <= hoy).length,
+          ganados:   activas.filter(r => r.resultado === 'ganado').length,
+          empatados: activas.filter(r => r.resultado === 'empatado').length,
+          perdidos:  activas.filter(r => r.resultado === 'perdido').length,
+        })
+      })
+    return () => { vivo = false }
+  }, [user])
 
   if (!user) return (
     <div className="page"><div className="container" style={{ textAlign: 'center', paddingTop: 64 }}>
@@ -94,6 +120,73 @@ export default function ProfilePage() {
             <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} onChange={handleAvatar} />
           </div>
         </div>
+
+        {/* ── Historial del jugador ─────────────────────────── */}
+        {stats && stats.reservados + stats.cancelados > 0 && (
+          <section style={{ marginBottom: 28 }}>
+            <h2 className="display-font" style={{ fontSize: 20, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ width: 4, height: 18, background: 'var(--green)', borderRadius: 2, display: 'inline-block' }} />
+              Mi historial
+            </h2>
+
+            <div className="grid-3" style={{ marginBottom: 12 }}>
+              <div className="stat-card" style={{ padding: 16 }}>
+                <div className="stat-label">Reservados</div>
+                <div className="stat-value">{stats.reservados}</div>
+                <div className="stat-sub">turnos en total</div>
+              </div>
+              <div className="stat-card" style={{ padding: 16 }}>
+                <div className="stat-label">Jugados este mes</div>
+                <div className="stat-value" style={{ color: 'var(--green)' }}>{stats.jugadosMes}</div>
+                <div className="stat-sub">partidos</div>
+              </div>
+              <div className="stat-card" style={{ padding: 16 }}>
+                <div className="stat-label">Dados de baja</div>
+                <div className="stat-value" style={{ color: stats.cancelados ? 'var(--error)' : undefined }}>{stats.cancelados}</div>
+                <div className="stat-sub">cancelados</div>
+              </div>
+            </div>
+
+            {/* Récord */}
+            <div className="card" style={{ padding: 16 }}>
+              <div className="stat-label" style={{ marginBottom: 12 }}>Récord</div>
+              {stats.ganados + stats.empatados + stats.perdidos === 0 ? (
+                <p style={{ fontSize: 13, color: 'var(--muted)' }}>
+                  Todavía no cargaste resultados. Después de jugar, cargalos desde <b>Mis turnos</b>.
+                </p>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', gap: 20 }}>
+                    {[
+                      { Icono: Trophy,    label: 'Ganados',   valor: stats.ganados,   color: 'var(--green)' },
+                      { Icono: Handshake, label: 'Empates',   valor: stats.empatados, color: 'var(--muted)' },
+                      { Icono: Frown,     label: 'Perdidos',  valor: stats.perdidos,  color: 'var(--error)' },
+                    ].map(({ Icono, label, valor, color }) => (
+                      <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <Icono size={18} style={{ color }} />
+                        <div>
+                          <div className="display-font" style={{ fontSize: 22, lineHeight: 1, color }}>{valor}</div>
+                          <div className="mono-caps" style={{ fontSize: 9, color: 'var(--muted)' }}>{label}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Barra proporcional */}
+                  <div style={{ display: 'flex', height: 8, borderRadius: 99, overflow: 'hidden', marginTop: 14, background: 'var(--surface-2)' }}>
+                    {[
+                      { v: stats.ganados,   c: 'var(--green)' },
+                      { v: stats.empatados, c: 'var(--border-dark)' },
+                      { v: stats.perdidos,  c: 'var(--error)' },
+                    ].map(({ v, c }, i) => v > 0 && (
+                      <div key={i} style={{ flex: v, background: c }} />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </section>
+        )}
 
         <form onSubmit={handleSubmit} className="card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
           {error && <div className="alert alert-error">{error}</div>}
