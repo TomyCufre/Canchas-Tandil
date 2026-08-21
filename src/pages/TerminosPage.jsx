@@ -19,7 +19,7 @@ export default function TerminosPage() {
         <p>
           Canchas Tandil (en adelante, <b>la Plataforma</b>) es un sitio web que permite a los jugadores
           encontrar canchas deportivas en la ciudad de Tandil, provincia de Buenos Aires, y solicitar turnos
-          en ellas. La Plataforma es operada por <PorDefinir>titular / razón social / CUIT</PorDefinir>.
+          en ellas. La Plataforma es operada por <b>Tomás Cufre</b>, CUIT 20-43867671-7.
         </p>
         <p>
           La Plataforma <b>no es propietaria, administradora ni operadora de las canchas</b> que se publican.
@@ -98,7 +98,7 @@ export default function TerminosPage() {
           <li>Publicar información veraz sobre sus canchas: precios, horarios, servicios y ubicación.</li>
           <li>Mantener actualizada la disponibilidad y honrar los turnos que confirme.</li>
           <li>Garantizar que las instalaciones se encuentren en condiciones adecuadas de uso y seguridad.</li>
-          <li>Contar con los habilitaciones y seguros que exija la normativa aplicable a su actividad.</li>
+          <li>Contar con las habilitaciones y seguros que exija la normativa aplicable a su actividad.</li>
         </ul>
       </Seccion>
 

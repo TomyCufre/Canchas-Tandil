@@ -17,7 +17,7 @@ export default function PrivacidadPage() {
       <Seccion n="1" titulo="Responsable de los datos">
         <p>
           El responsable del tratamiento de los datos personales recopilados en Canchas Tandil es{' '}
-          <PorDefinir>titular / razón social / CUIT</PorDefinir>, con domicilio en{' '}
+          <b>Tomás Cufre</b>, CUIT 20-43867671-7, con domicilio en{' '}
           <PorDefinir>domicilio</PorDefinir>. Para cualquier consulta:{' '}
           <PorDefinir>email de contacto</PorDefinir>.
         </p>
