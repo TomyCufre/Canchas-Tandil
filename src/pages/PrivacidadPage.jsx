@@ -121,17 +121,7 @@ export default function PrivacidadPage() {
         </p>
       </Seccion>
 
-      <Seccion n="10" titulo="Menores de edad">
-        <p>
-          La Plataforma admite usuarios a partir de los <b>15 años</b>. Quienes tengan entre 15 y 18 años
-          deben contar con la autorización de su madre, padre o tutor para registrarse, quien podrá ejercer
-          en su nombre los derechos sobre los datos y solicitar la baja de la cuenta escribiéndonos a{' '}
-          <PorDefinir>email de contacto</PorDefinir>. No recopilamos datos de menores de 15 años; si
-          detectamos una cuenta de ese tipo, la damos de baja.
-        </p>
-      </Seccion>
-
-      <Seccion n="11" titulo="Cambios en esta política">
+      <Seccion n="10" titulo="Cambios en esta política">
         <p>
           Podemos actualizar esta política. Los cambios relevantes se informarán dentro de la Plataforma,
           indicando la fecha de la última actualización.
