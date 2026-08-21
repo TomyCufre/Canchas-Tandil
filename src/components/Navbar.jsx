@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useTheme } from '../contexts/ThemeContext'
 import { supabase } from '../lib/supabase'
 import { fechaLocal } from '../lib/fecha'
-import { LogOut, LayoutDashboard, Calendar, Home, UserCircle, ShieldCheck, Bell } from 'lucide-react'
+import { LogOut, LayoutDashboard, Calendar, Home, UserCircle, ShieldCheck, Bell, Sun, Moon } from 'lucide-react'
 
 export default function Navbar() {
   const { user, profile, signOut } = useAuth()
+  const { esOscuro, alternarTema } = useTheme()
   const navigate = useNavigate()
   const [pendientes, setPendientes] = useState(0)
 
@@ -35,20 +37,34 @@ export default function Navbar() {
     navigate('/')
   }
 
+  const botonTema = (
+    <button
+      onClick={alternarTema}
+      className="btn btn-ghost btn-sm"
+      title={esOscuro ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+      aria-label={esOscuro ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+    >
+      {esOscuro ? <Sun size={16} /> : <Moon size={16} />}
+    </button>
+  )
+
   return (
     <nav style={{
-      background: '#fff',
+      background: 'var(--card)',
       borderBottom: '1px solid var(--border)',
       position: 'sticky',
       top: 0,
       zIndex: 100,
       boxShadow: 'var(--shadow)',
     }}>
-      <div className="container" style={{ display: 'flex', alignItems: 'center', height: 56, gap: 8 }}>
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', marginRight: 'auto' }}>
+      <div className="container" style={{ display: 'flex', alignItems: 'center', height: 60, gap: 8 }}>
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', marginRight: 'auto' }}>
           <img src="/icon-512.png" alt="Canchas Tandil" style={{ width: 34, height: 34, borderRadius: 8, objectFit: 'cover' }} />
-          <span style={{ fontWeight: 700, fontSize: 16, color: 'var(--text)' }}>
-            Canchas <span style={{ color: 'var(--green)' }}>Tandil</span>
+          <span
+            className="display-font"
+            style={{ fontSize: 22, color: 'var(--green)', fontStyle: 'italic', letterSpacing: '-0.01em', lineHeight: 1 }}
+          >
+            Canchas Tandil
           </span>
         </Link>
 
@@ -67,8 +83,8 @@ export default function Navbar() {
                   <Bell size={16} />
                   {pendientes > 0 && (
                     <span style={{
-                      position: 'absolute', top: 0, right: 0, background: 'var(--error)', color: '#fff',
-                      fontSize: 9, fontWeight: 700, minWidth: 16, height: 16, borderRadius: 8,
+                      position: 'absolute', top: 0, right: 0, background: 'var(--warn)', color: '#1a1005',
+                      fontSize: 9, fontWeight: 800, minWidth: 16, height: 16, borderRadius: 8,
                       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px',
                     }}>{pendientes > 99 ? '99+' : pendientes}</span>
                   )}
@@ -85,23 +101,25 @@ export default function Navbar() {
                 <span className="hide-mobile">Admin</span>
               </Link>
             )}
+            {botonTema}
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, borderLeft: '1px solid var(--border)', paddingLeft: 8 }}>
               <Link to="/perfil" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
                 {profile.avatar_url
                   ? <img src={profile.avatar_url} alt="" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--green)' }} />
                   : <UserCircle size={28} style={{ color: 'var(--muted)' }} />}
                 <div style={{ lineHeight: 1.2 }} className="hide-mobile">
-                  <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>{profile.nombre}</div>
-                  <div style={{ fontSize: 11, color: 'var(--muted)' }}>{profile.rol === 'dueno' ? 'dueño' : 'jugador'}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)' }}>{profile.nombre}</div>
+                  <div className="mono-caps" style={{ fontSize: 10, color: 'var(--muted)' }}>{profile.rol === 'dueno' ? 'dueño' : 'jugador'}</div>
                 </div>
               </Link>
-              <button onClick={handleSignOut} className="btn btn-ghost btn-sm" title="Cerrar sesión">
+              <button onClick={handleSignOut} className="btn btn-ghost btn-sm" title="Cerrar sesión" aria-label="Cerrar sesión">
                 <LogOut size={15} />
               </button>
             </div>
           </>
         ) : (
           <>
+            {botonTema}
             <Link to="/login" className="btn btn-ghost btn-sm">Ingresar</Link>
             <Link to="/register" className="btn btn-primary btn-sm">Registrarse</Link>
           </>
